@@ -1,6 +1,7 @@
 package pers.kagw.core;
 
 
+import pers.kagw.core.protocol.netty.NettyService;
 import pers.kagw.core.registry.RegistryService;
 
 /**
@@ -13,8 +14,11 @@ public class KagwApplicationContext {
 
     private final RegistryService registryService;
 
-    public KagwApplicationContext(RegistryService registryService, String port) {
+    private final NettyService nettyService;
+
+    public KagwApplicationContext(RegistryService registryService, int port) {
         try {
+            this.nettyService = new NettyService(port);
             this.registryService = registryService;
         } catch (Exception e) {
             throw new RuntimeException();
