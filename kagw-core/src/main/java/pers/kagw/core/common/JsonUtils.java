@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 public class JsonUtils {
 
     private static final JsonMapper JSON_MAPPER = new JsonMapper();
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static <T> T readValue(byte[] bytes, Class<T> clazz) throws Exception {
         return JSON_MAPPER.readValue(bytes, clazz);

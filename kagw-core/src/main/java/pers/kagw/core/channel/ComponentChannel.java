@@ -3,5 +3,17 @@ package pers.kagw.core.channel;
 /**
  * @author kwsc98
  */
-public interface ComponentChannel {
+public class ComponentChannel implements Channel {
+
+    ComponentChannelPipeline preChannelPipeline;
+
+    public ComponentChannel() {
+        this.preChannelPipeline = ComponentChannelPipeline.build();
+    }
+
+    @Override
+    public ChannelPipeline pipeline() {
+        return preChannelPipeline;
+    }
+
 }

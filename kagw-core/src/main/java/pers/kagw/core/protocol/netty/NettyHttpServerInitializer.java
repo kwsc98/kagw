@@ -7,12 +7,21 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 import lombok.extern.slf4j.Slf4j;
+import pers.kagw.core.KagwApplicationContext;
 
 /**
  * @author kwsc98
  */
 @Slf4j
 public class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel> {
+
+    private final KagwApplicationContext kagwApplicationContext;
+
+    public NettyHttpServerInitializer(KagwApplicationContext kagwApplicationContext){
+        this.kagwApplicationContext = kagwApplicationContext;
+    }
+
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline p = ch.pipeline();
@@ -23,6 +32,6 @@ public class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel
         // 处理POST请求中 100-continue 状态数据
         p.addLast(new HttpServerExpectContinueHandler());
         // Http请求处理
-        p.addLast(new NettyHttpServerHandler());
+        p.addLast(new NettyHttpServerHandler(this.kagwApplicationContext));
     }
 }

@@ -7,8 +7,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+import pers.kagw.core.KagwApplicationContext;
 import pers.kagw.core.common.JsonUtils;
-import pers.kagw.core.dto.CommonRequest;
 
 /**
  * @author kwsc98
@@ -16,6 +16,11 @@ import pers.kagw.core.dto.CommonRequest;
 @Slf4j
 public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
+    private final KagwApplicationContext kagwApplicationContext;
+
+    public NettyHttpServerHandler(KagwApplicationContext kagwApplicationContext) {
+        this.kagwApplicationContext = kagwApplicationContext;
+    }
 
 
     @Override
@@ -28,9 +33,10 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
                 String uri = httpRequest.uri();
                 String content = httpRequest.content().toString(CharsetUtil.UTF_8);
                 HttpMethod method = httpRequest.method();
-                log.info("Receive Request Url: {} ,Content: {} ,Method: {} ", uri, JsonUtils.formatJsonStr(content), method);
+                log.info("Request Url: {} ,Content: {} ,Method: {} ", uri, JsonUtils.formatJsonStr(content), method);
                 //网关处理逻辑
-                String responseMsg = "Hello World";
+                String responseMsg = this.kagwApplicationContext.getInterfaceService().doRun(httpRequest);
+                log.info("Response Url: {} ,Content: {} ,Method: {} ", uri, responseMsg, method);
                 FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.copiedBuffer(responseMsg, CharsetUtil.UTF_8));
                 response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain;charset=UTF-8");
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);

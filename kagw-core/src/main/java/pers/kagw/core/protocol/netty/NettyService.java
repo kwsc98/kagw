@@ -10,6 +10,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import pers.kagw.core.KagwApplicationContext;
 
 /**
  * @author kwsc98
@@ -21,7 +22,8 @@ public class NettyService {
 
     EventLoopGroup workerGroup;
 
-    public NettyService(int port) {
+
+    public NettyService(int port, KagwApplicationContext kagwApplicationContext) {
         //NioEventLoopGroup是对Thread和Selector的封装
         //主线程
         bossGroup = new NioEventLoopGroup(1);
@@ -40,7 +42,7 @@ public class NettyService {
                     //开启HTTP长连接支持
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new NettyHttpServerInitializer());
+                    .childHandler(new NettyHttpServerInitializer(kagwApplicationContext));
             Channel channel = b.bind(port).sync().channel();
             log.info("server channel start port:{} channel:{}", port, channel);
         } catch (Exception e) {
