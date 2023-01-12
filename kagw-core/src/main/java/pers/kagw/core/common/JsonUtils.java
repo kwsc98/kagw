@@ -28,4 +28,9 @@ public class JsonUtils {
         return JSON_MAPPER.writeValueAsString(JSON_MAPPER.readValue(jsonStr, Object.class));
     }
 
+    public static String writeValueAsString(Object object) throws JsonProcessingException {
+        return JSON_MAPPER.writeValueAsString(object);
+    }
+
+
 }

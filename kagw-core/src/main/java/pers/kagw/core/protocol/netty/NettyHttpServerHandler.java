@@ -22,6 +22,11 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
         this.kagwApplicationContext = kagwApplicationContext;
     }
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        log.info("Server Channel Connection: [{}] parent [{}]", ctx.channel(), ctx.channel().parent());
+    }
+
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
@@ -35,10 +40,11 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
                 HttpMethod method = httpRequest.method();
                 log.info("Request Url: {} ,Content: {} ,Method: {} ", uri, JsonUtils.formatJsonStr(content), method);
                 //网关处理逻辑
-                String responseMsg = this.kagwApplicationContext.getInterfaceService().doRun(httpRequest);
+                Object responseObject = this.kagwApplicationContext.getDisposeService().dealWith(httpRequest);
+                String responseMsg = JsonUtils.writeValueAsString(responseObject);
                 log.info("Response Url: {} ,Content: {} ,Method: {} ", uri, responseMsg, method);
                 FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.copiedBuffer(responseMsg, CharsetUtil.UTF_8));
-                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain;charset=UTF-8");
+                response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
             } catch (Exception e) {
                 log.error("Netty Handler Error ", e);
@@ -46,5 +52,11 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
                 httpRequest.release();
             }
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error("Server Channel Error", cause);
+        ctx.close();
     }
 }

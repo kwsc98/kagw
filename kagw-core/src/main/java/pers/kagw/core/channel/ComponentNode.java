@@ -1,6 +1,7 @@
 package pers.kagw.core.channel;
 
 import lombok.Getter;
+import pers.kagw.core.handler.ComponentHandler;
 
 /**
  * @author kwsc98
@@ -12,7 +13,7 @@ public class ComponentNode {
 
     private ComponentNode sufNode = null;
 
-    private ComponentHandler handler = null;
+    private ComponentHandler<?> handler = null;
 
     private String configJsonStr = null;
 

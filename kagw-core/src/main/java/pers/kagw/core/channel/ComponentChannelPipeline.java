@@ -1,6 +1,8 @@
 package pers.kagw.core.channel;
 
 import lombok.Getter;
+import pers.kagw.core.handler.ComponentHandler;
+
 import java.util.Objects;
 
 /**
@@ -18,6 +20,12 @@ public class ComponentChannelPipeline implements ChannelPipeline {
                 .setFirstNode(ComponentNode.build())
                 .setLastNode(ComponentNode.build());
     }
+
+    @Override
+    public NodeIterator getIterator() {
+        return new NodeIterator(firstNode);
+    }
+
 
     @Override
     public ChannelPipeline addFirst(ComponentNode componentNode) {
