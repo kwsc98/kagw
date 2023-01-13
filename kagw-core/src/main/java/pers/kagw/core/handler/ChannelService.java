@@ -7,10 +7,15 @@ import pers.kagw.core.channel.Channel;
 import pers.kagw.core.channel.ChannelPipeline;
 import pers.kagw.core.channel.ComponentChannel;
 import pers.kagw.core.channel.ComponentNode;
+import pers.kagw.core.common.LoadBalancer;
 import pers.kagw.core.common.Trie;
+import pers.kagw.core.common.WrrSmoothImpl;
+import pers.kagw.core.dto.BaseDTO;
 import pers.kagw.core.dto.GroupDTO;
 import pers.kagw.core.dto.InterfaceDTO;
+import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
+import pers.kagw.core.handler.impl.NettyClientComponentHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,35 +26,46 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChannelService {
 
-    private KagwApplicationContext kagwApplicationContext;
+    private final KagwApplicationContext kagwApplicationContext;
 
-    private Map<String, Channel> channelMap;
+    private final Trie<ResourceDTO> resourceTrie;
 
-    private Trie<Channel> channelTrie;
+    private final NettyClientComponentHandler nettyClientComponentHandler;
 
     public ChannelService(KagwApplicationContext kagwApplicationContext) {
-        this.channelMap = new HashMap<>();
-        this.channelTrie = new Trie<>();
+        this.resourceTrie = new Trie<>();
         this.kagwApplicationContext = kagwApplicationContext;
+        this.nettyClientComponentHandler = new NettyClientComponentHandler();
     }
 
-    public Channel getChannel(String url) {
-        return this.channelMap.get(url);
+    public ResourceDTO getResource(String url) {
+        return this.resourceTrie.get(splitUrl(url));
     }
 
 
     public synchronized void registrationGroup(GroupDTO groupDTO) {
-        log.info("GroupDTO :{} Start Registration", groupDTO.getGroupName());
-        List<String> keys = splitUrl(groupDTO.getPreUrl());
+        log.info("GroupDTO :{} Start Registration", groupDTO.getResourceName());
+        LoadBalancer loadBalancer = groupDTO.getLoadBalancer();
+        ResourceDTO groupResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer);
+        Channel groupChannel = getComponentChannel(null, groupDTO.getHandlerList(), groupResourceDTO);
+        groupResourceDTO.setChannel(groupChannel);
+        this.resourceTrie.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
+        List<InterfaceDTO> interfaceDTOList = groupDTO.getInterfaceDTOList();
+        for (InterfaceDTO interfaceDTO : interfaceDTOList) {
+            List<String> groupHandlerList = null;
+            if (interfaceDTO.isGroupExtends()) {
+                groupHandlerList = groupDTO.getHandlerList();
+            }
+            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer);
+            Channel interfaceChannel = getComponentChannel(groupHandlerList, groupDTO.getHandlerList(), interfaceResourceDTO);
+            interfaceResourceDTO.setChannel(interfaceChannel);
+            this.resourceTrie.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
 
-        log.info("GroupDTO :{} Registration Done", groupDTO.getGroupName());
+        }
+        log.info("GroupDTO :{} Registration Done", groupDTO.getResourceName());
     }
 
-    private void registrationInterface(InterfaceDTO interfaceDTO) {
-
-    }
-
-    private Channel getComponentChannel(List<String> groupHandlerList, List<String> interfacehandlerList) {
+    private Channel getComponentChannel(List<String> groupHandlerList, List<String> interfacehandlerList, ResourceDTO resourceDTO) {
         List<String> handlerList = new ArrayList<>();
         if (Objects.nonNull(groupHandlerList) && !groupHandlerList.isEmpty()) {
             handlerList.addAll(groupHandlerList);
@@ -62,9 +78,9 @@ public class ChannelService {
         HandlerService handlerService = this.kagwApplicationContext.getHandlerService();
         for (String handlerStr : handlerList) {
             String[] handler = handlerStr.split(":", 2);
-            ComponentHandler<?> componentHandler = handlerService.getComponentHandler(handler[0]);
+            ComponentHandler<Object, Object> componentHandler = handlerService.getComponentHandler(handler[0]);
             if (Objects.nonNull(componentHandler)) {
-                ComponentNode componentNode = ComponentNode.build().setHandler(componentHandler);
+                ComponentNode componentNode = ComponentNode.build().setHandler(componentHandler).setConfigJsonStr(handler[0]);
                 if (handler.length > 1) {
                     componentNode.setConfigJsonStr(handler[1]);
                 }
@@ -80,12 +96,11 @@ public class ChannelService {
         for (ComponentNode componentNode : requestComponentNodeList) {
             channelPipeline.addLast(componentNode);
         }
-
+        ComponentNode nettyClientComponentNode = ComponentNode.build().setHandler(this.nettyClientComponentHandler).setConfigObject(resourceDTO);
+        channelPipeline.addLast(nettyClientComponentNode);
         for (ComponentNode componentNode : responseComponentNodeList) {
             channelPipeline.addLast(componentNode);
         }
-
-
         return componentChannel;
     }
 

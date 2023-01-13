@@ -7,14 +7,19 @@ import java.util.Map;
  * @author kwsc98
  */
 public class HandlerService {
-    private final Map<String, ComponentHandler<?>> channelMap = new HashMap<>();
+    private final Map<String, ComponentHandler<Object,Object>> channelMap = new HashMap<>();
 
-    public void registerChannelHandler(String name, ComponentHandler<?> componentHandler) {
+    public void registerChannelHandler(String name, ComponentHandler<Object,Object> componentHandler) {
         channelMap.put(name, componentHandler);
     }
 
-    public ComponentHandler<?> getComponentHandler(String name) {
+    public ComponentHandler<Object,Object> getComponentHandler(String name) {
         return channelMap.get(name);
+    }
+
+
+    public static void main(String[] args) {
+
     }
 
 }

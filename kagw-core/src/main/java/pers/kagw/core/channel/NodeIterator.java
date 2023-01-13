@@ -16,7 +16,7 @@ public class NodeIterator {
 
 
     public boolean hasNext() {
-        return Objects.nonNull(componentNode.getPreNode()) && Objects.nonNull(componentNode.getSufNode());
+        return Objects.nonNull(componentNode.getSufNode()) && Objects.nonNull(componentNode.getSufNode().getSufNode());
     }
 
     public ComponentNode next() {

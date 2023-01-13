@@ -2,6 +2,7 @@ package pers.kagw.core;
 
 
 import lombok.Getter;
+import pers.kagw.core.dto.GroupDTO;
 import pers.kagw.core.handler.ChannelService;
 import pers.kagw.core.handler.HandlerService;
 import pers.kagw.core.protocol.netty.NettyService;
@@ -23,6 +24,7 @@ public class KagwApplicationContext {
     private final ChannelService channelService;
 
     private final DisposeService disposeService;
+
 
     public KagwApplicationContext(RegistryService registryService, int port) {
         try {

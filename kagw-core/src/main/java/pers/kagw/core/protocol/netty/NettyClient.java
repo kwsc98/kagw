@@ -28,7 +28,7 @@ public class NettyClient {
     /**
      * 采用共享变量的方式，进行异步回调处理
      **/
-    public static final Cache<String, Promise<String>> MSG_CACHE = Caffeine.newBuilder().expireAfterAccess(10000L, TimeUnit.MILLISECONDS).build();
+    public static final Cache<String, Promise<Object>> MSG_CACHE = Caffeine.newBuilder().expireAfterAccess(10000L, TimeUnit.MILLISECONDS).build();
 
     public static final Map<String, Map<Integer, Channel>> CHANNEL_MAP = new HashMap<>();
 

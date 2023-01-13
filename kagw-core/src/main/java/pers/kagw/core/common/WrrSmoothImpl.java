@@ -17,15 +17,16 @@ public class WrrSmoothImpl implements LoadBalancer {
 
         Wrr(RouteNodeDTO routeNodeDTO) {
             this.addres = routeNodeDTO.getAddres();
-            this.weight = BigDecimal.valueOf(routeNodeDTO.getWeight() * 100).intValue();
+            this.weight = routeNodeDTO.getWeight();
         }
     }
 
     private Wrr[] cachedWeights;
 
     @Override
-    public void init(List<RouteNodeDTO> list) {
+    public LoadBalancer init(List<RouteNodeDTO> list) {
         this.cachedWeights = list.stream().map(Wrr::new).toArray(Wrr[]::new);
+        return this;
     }
 
     @Override
@@ -43,4 +44,5 @@ public class WrrSmoothImpl implements LoadBalancer {
         shed.current -= total;
         return shed.addres;
     }
+
 }

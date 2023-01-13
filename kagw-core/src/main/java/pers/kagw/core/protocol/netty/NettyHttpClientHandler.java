@@ -28,11 +28,11 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpObje
             FullHttpResponse fullHttpResponse = (FullHttpResponse) msg;
             log.info("HttpResponse Status: {}", fullHttpResponse.status());
             if (!HttpResponseStatus.OK.equals(fullHttpResponse.status())) {
-                throw new NettyHttpClientException(fullHttpResponse.status()) ;
+                throw new NettyHttpClientException(fullHttpResponse.status());
             }
             String uniqueIdentifier = fullHttpResponse.headers().get("uniqueIdentifier");
             //从共享变量中获取Promise
-            Promise<String> promise = NettyClient.MSG_CACHE.getIfPresent(uniqueIdentifier);
+            Promise<Object> promise = NettyClient.MSG_CACHE.getIfPresent(uniqueIdentifier);
             if (Objects.nonNull(promise)) {
                 promise.setSuccess(fullHttpResponse.content().toString(CharsetUtil.UTF_8));
             }

@@ -16,9 +16,11 @@ public class ComponentChannelPipeline implements ChannelPipeline {
     private ComponentNode lastNode;
 
     public static ComponentChannelPipeline build() {
-        return new ComponentChannelPipeline()
-                .setFirstNode(ComponentNode.build())
-                .setLastNode(ComponentNode.build());
+        ComponentNode firstNode = ComponentNode.build();
+        ComponentNode lastNode = ComponentNode.build();
+        firstNode.setSufNode(lastNode);
+        lastNode.setPreNode(firstNode);
+        return new ComponentChannelPipeline().setFirstNode(firstNode).setLastNode(lastNode);
     }
 
     @Override
@@ -52,12 +54,12 @@ public class ComponentChannelPipeline implements ChannelPipeline {
     }
 
     @Override
-    public ChannelPipeline addFirst(ComponentHandler handler, String configJsonStr) {
+    public ChannelPipeline addFirst(ComponentHandler<Object,Object> handler, String configJsonStr) {
         return this.addFirst(ComponentNode.build().setHandler(handler).setConfigJsonStr(configJsonStr));
     }
 
     @Override
-    public ChannelPipeline addLast(ComponentHandler handler, String configJsonStr) {
+    public ChannelPipeline addLast(ComponentHandler<Object,Object> handler, String configJsonStr) {
         return this.addLast(ComponentNode.build().setHandler(handler).setConfigJsonStr(configJsonStr));
     }
 

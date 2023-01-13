@@ -13,14 +13,14 @@ public class RouteNodeDTO implements Serializable {
 
     private String addres;
 
-    private double weight = 1;
+    private int weight = 1;
 
     public RouteNodeDTO setAddres(String addres) {
         this.addres = addres;
         return this;
     }
 
-    public RouteNodeDTO setWeight(double weight) {
+    public RouteNodeDTO setWeight(int weight) {
         this.weight = weight;
         return this;
     }

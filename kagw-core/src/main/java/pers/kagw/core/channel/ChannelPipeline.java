@@ -15,8 +15,8 @@ public interface ChannelPipeline {
 
     ChannelPipeline addLast(ComponentNode componentNode);
 
-    ChannelPipeline addFirst(ComponentHandler handler, String configJsonStr);
+    ChannelPipeline addFirst(ComponentHandler<Object,Object> handler, String configJsonStr);
 
-    ChannelPipeline addLast(ComponentHandler handler, String configJsonStr);
+    ChannelPipeline addLast(ComponentHandler<Object,Object> handler, String configJsonStr);
 
 }

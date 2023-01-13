@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface LoadBalancer {
 
-    void init(List<RouteNodeDTO> list);
+    LoadBalancer init(List<RouteNodeDTO> list);
 
     String next();
 

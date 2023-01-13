@@ -4,6 +4,6 @@ package pers.kagw.core.handler;
 /**
  * @author kwsc98
  */
-public interface ResponseComponentHandler<T> extends ComponentHandler<T> {
+public abstract class ResponseComponentHandler<T,C> extends ComponentHandler<T,C> {
 
 }
