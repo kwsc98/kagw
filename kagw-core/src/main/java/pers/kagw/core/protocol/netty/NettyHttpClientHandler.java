@@ -30,7 +30,7 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpObje
             if (!HttpResponseStatus.OK.equals(fullHttpResponse.status())) {
                 throw new NettyHttpClientException(fullHttpResponse.status());
             }
-            String uniqueIdentifier = fullHttpResponse.headers().get("uniqueIdentifier");
+            String uniqueIdentifier = fullHttpResponse.headers().get("uuid");
             //从共享变量中获取Promise
             Promise<Object> promise = NettyClient.MSG_CACHE.getIfPresent(uniqueIdentifier);
             if (Objects.nonNull(promise)) {

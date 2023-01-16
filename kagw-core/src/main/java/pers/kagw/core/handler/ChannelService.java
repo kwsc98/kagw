@@ -16,6 +16,7 @@ import pers.kagw.core.dto.InterfaceDTO;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.impl.NettyClientComponentHandler;
+import pers.kagw.core.handler.impl.OkHttpClientComponentHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,12 +31,12 @@ public class ChannelService {
 
     private final Trie<ResourceDTO> resourceTrie;
 
-    private final NettyClientComponentHandler nettyClientComponentHandler;
+    private final OkHttpClientComponentHandler okHttpClientComponentHandler;
 
     public ChannelService(KagwApplicationContext kagwApplicationContext) {
         this.resourceTrie = new Trie<>();
         this.kagwApplicationContext = kagwApplicationContext;
-        this.nettyClientComponentHandler = new NettyClientComponentHandler();
+        this.okHttpClientComponentHandler = new OkHttpClientComponentHandler();
     }
 
     public ResourceDTO getResource(String url) {
@@ -56,7 +57,7 @@ public class ChannelService {
             if (interfaceDTO.isGroupExtends()) {
                 groupHandlerList = groupDTO.getHandlerList();
             }
-            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer);
+            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer).setRouteResourceUrl(interfaceDTO.getResourceUrl());
             Channel interfaceChannel = getComponentChannel(groupHandlerList, groupDTO.getHandlerList(), interfaceResourceDTO);
             interfaceResourceDTO.setChannel(interfaceChannel);
             this.resourceTrie.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
@@ -96,7 +97,7 @@ public class ChannelService {
         for (ComponentNode componentNode : requestComponentNodeList) {
             channelPipeline.addLast(componentNode);
         }
-        ComponentNode nettyClientComponentNode = ComponentNode.build().setHandler(this.nettyClientComponentHandler).setConfigObject(resourceDTO);
+        ComponentNode nettyClientComponentNode = ComponentNode.build().setHandler(this.okHttpClientComponentHandler).setConfigObject(resourceDTO);
         channelPipeline.addLast(nettyClientComponentNode);
         for (ComponentNode componentNode : responseComponentNodeList) {
             channelPipeline.addLast(componentNode);

@@ -3,6 +3,8 @@ dependencies {
     implementation 'io.netty:netty-all:4.1.79.Final'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'com.alibaba.nacos:nacos-client:2.1.1'
+    implementation 'com.growingio.android:okhttp3:3.4.5'
+
 }
 
 tasks.named("jar") {

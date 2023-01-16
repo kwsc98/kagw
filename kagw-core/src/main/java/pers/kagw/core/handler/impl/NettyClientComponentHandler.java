@@ -1,8 +1,11 @@
 package pers.kagw.core.handler.impl;
 
+import com.alibaba.nacos.common.utils.StringUtils;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.DefaultEventLoop;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +39,13 @@ public class NettyClientComponentHandler extends RequestComponentHandler<FullHtt
         try {
             String[] urlString = resourceDTO.getLoadBalancer().next().split(":");
             String ip = urlString[0];
+            if (StringUtils.isNotEmpty(resourceDTO.getRouteResourceUrl())) {
+                fullHttpRequest.setUri(resourceDTO.getRouteResourceUrl());
+            }
             int port = Integer.parseInt(urlString[1]);
             Channel channel = nettyClient.getChannel(ip, port);
-            String uuid = java.util.UUID.randomUUID().toString();
-            fullHttpRequest.headers().set("uniqueIdentifier", uuid);
             Promise<Object> promise = new DefaultPromise<>(new DefaultEventLoop());
+            String uuid = java.util.UUID.randomUUID().toString();
             NettyClient.MSG_CACHE.put(uuid, promise);
             channel.writeAndFlush(fullHttpRequest);
             Object object = promise.get(resourceDTO.getBaseDTO().getTimeOut(), TimeUnit.MILLISECONDS);

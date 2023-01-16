@@ -13,6 +13,8 @@ public class ResourceDTO {
 
     private BaseDTO baseDTO;
 
+    private String routeResourceUrl;
+
     private LoadBalancer loadBalancer;
 
     public static ResourceDTO build(){
@@ -31,6 +33,11 @@ public class ResourceDTO {
 
     public ResourceDTO setLoadBalancer(LoadBalancer loadBalancer) {
         this.loadBalancer = loadBalancer;
+        return this;
+    }
+
+    public ResourceDTO setRouteResourceUrl(String routeResourceUrl) {
+        this.routeResourceUrl = routeResourceUrl;
         return this;
     }
 }

@@ -4,6 +4,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import pers.kagw.core.channel.Channel;
 import pers.kagw.core.channel.ComponentNode;
 import pers.kagw.core.channel.NodeIterator;
+import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.handler.ChannelService;
 
 /**
@@ -21,7 +22,8 @@ public class DisposeService {
     public Object dealWith(FullHttpRequest fullHttpRequest) {
         ChannelService channelService = kagwApplicationContext.getChannelService();
         String uri = fullHttpRequest.uri();
-        Channel componentChannel = channelService.getResource(uri).getChannel();
+        ResourceDTO resourceDTO = channelService.getResource(uri);
+        Channel componentChannel = resourceDTO.getChannel();
         NodeIterator nodeIterator = componentChannel.pipeline().getIterator();
         return handle(fullHttpRequest, nodeIterator);
     }

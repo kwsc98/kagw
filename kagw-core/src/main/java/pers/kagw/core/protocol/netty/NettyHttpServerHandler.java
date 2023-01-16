@@ -41,13 +41,12 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
                 log.info("Request Url: {} ,Content: {} ,Method: {} ", uri, JsonUtils.formatJsonStr(content), method);
                 //网关处理逻辑
                 Object responseObject = this.kagwApplicationContext.getDisposeService().dealWith(httpRequest);
-                String responseMsg = JsonUtils.writeValueAsString(responseObject);
-                log.info("Response Url: {} ,Content: {} ,Method: {} ", uri, responseMsg, method);
-                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.copiedBuffer(responseMsg, CharsetUtil.UTF_8));
+                log.info("Response Url: {} ,Content: {} ,Method: {} ", uri, responseObject, method);
+                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.copiedBuffer(responseObject.toString(), CharsetUtil.UTF_8));
                 response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
             } catch (Exception e) {
-                log.error("Netty Handler Error ", e);
+                log.error("Netty Handler Error :{}", e.toString());
             } finally {
                 httpRequest.release();
             }
