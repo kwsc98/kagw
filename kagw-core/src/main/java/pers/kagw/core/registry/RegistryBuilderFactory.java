@@ -14,11 +14,12 @@ public class RegistryBuilderFactory {
 
     private RegistryClientInfo registryClientInfo;
 
-    public static RegistryBuilderFactory builder(RegistryClientInfo registryClientInfo) {
-        return new RegistryBuilderFactory().setRegistryClientInfo(registryClientInfo);
+    public static RegistryBuilderFactory builder() {
+        return new RegistryBuilderFactory();
     }
 
-    public RegistryService build() {
+
+    public RegistryService init() {
         RegistryService registryService = null;
         switch (registryClientInfo.getClient()) {
             case Nacos:

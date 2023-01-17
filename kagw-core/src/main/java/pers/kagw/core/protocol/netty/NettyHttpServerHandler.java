@@ -1,5 +1,7 @@
 package pers.kagw.core.protocol.netty;
 
+import com.alibaba.nacos.common.utils.StringUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,8 +9,14 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import pers.kagw.core.KagwApplicationContext;
 import pers.kagw.core.common.JsonUtils;
+import pers.kagw.core.dto.RequestHandlerDTO;
+import pers.kagw.core.exception.ApiGateWayException;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author kwsc98
@@ -30,32 +38,47 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
-        if (msg instanceof FullHttpRequest) {
-            //获取httpRequest
-            FullHttpRequest httpRequest = (FullHttpRequest) msg;
-            try {
+        MDC.put("UUID", UUID.randomUUID().toString());
+        try {
+            if (msg instanceof FullHttpRequest) {
+                //获取httpRequest
+                FullHttpRequest httpRequest = (FullHttpRequest) msg;
                 //获取请求路径、请求体、请求方法
-                String uri = httpRequest.uri();
+                String url = httpRequest.uri();
                 String content = httpRequest.content().toString(CharsetUtil.UTF_8);
+                content = JsonUtils.formatJsonStr(content);
                 HttpMethod method = httpRequest.method();
-                log.info("Request Url: {} ,Content: {} ,Method: {} ", uri, JsonUtils.formatJsonStr(content), method);
+                RequestHandlerDTO<Object> requestHandlerDTO = RequestHandlerDTO.build().setContent(content).setResourceUrl(url).setHttpMethod(method);
+                log.info("Request Url: {} ,Content: {} ,Method: {} ", url, content, method);
                 //网关处理逻辑
-                Object responseObject = this.kagwApplicationContext.getDisposeService().dealWith(httpRequest);
-                log.info("Response Url: {} ,Content: {} ,Method: {} ", uri, responseObject, method);
+                Object responseObject = null;
+                try {
+                    responseObject = this.kagwApplicationContext.getDisposeService().dealWith(requestHandlerDTO);
+                } catch (ApiGateWayException apiGateWayException) {
+                    String infoStr = apiGateWayException.getInfoStr();
+                    log.debug("DealWith Error :{}", infoStr);
+                    if (StringUtils.isNotEmpty(infoStr)) {
+                        responseObject = infoStr;
+                    }
+                }
+                if (Objects.isNull(responseObject) || (!(responseObject instanceof String))) {
+                    responseObject = JsonUtils.writeValueAsString(responseObject);
+                }
+                log.info("Response Url: {} ,Content: {} ,Method: {} ", url, responseObject, method);
                 FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.copiedBuffer(responseObject.toString(), CharsetUtil.UTF_8));
                 response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-            } catch (Exception e) {
-                log.error("Netty Handler Error :{}", e.toString());
-            } finally {
-                httpRequest.release();
             }
+        } catch (Exception e) {
+            log.error("Netty Handler Error :{}", e.toString());
+        } finally {
+            MDC.remove("UUID");
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("Server Channel Error", cause);
+        log.error("Server Channel Error :{}", cause.toString());
         ctx.close();
     }
 }

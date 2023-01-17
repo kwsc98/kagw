@@ -8,6 +8,8 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import pers.kagw.core.common.JsonUtils;
+import pers.kagw.core.dto.RequestHandlerDTO;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.RequestComponentHandler;
@@ -19,7 +21,7 @@ import java.util.Objects;
  * @author kwsc98
  */
 @Slf4j
-public class OkHttpClientComponentHandler extends RequestComponentHandler<FullHttpRequest, ResourceDTO> {
+public class OkHttpClientComponentHandler extends RequestComponentHandler<RequestHandlerDTO<Object>, ResourceDTO> {
 
 
     private final OkHttpClientService okHttpClientService;
@@ -30,29 +32,32 @@ public class OkHttpClientComponentHandler extends RequestComponentHandler<FullHt
 
 
     @Override
-    public Object handle(FullHttpRequest fullHttpRequest, ResourceDTO resourceDTO) {
+    public Object handle(RequestHandlerDTO<Object> requestHandlerDTO, ResourceDTO resourceDTO) {
         log.debug("OkHttpClientComponentHandler Start Handler");
         Response response = null;
         try {
             String addres = resourceDTO.getLoadBalancer().next();
+            String resourceUrl = requestHandlerDTO.getResourceUrl();
             if (StringUtils.isNotEmpty(resourceDTO.getRouteResourceUrl())) {
-                fullHttpRequest.setUri(resourceDTO.getRouteResourceUrl());
+                resourceUrl = resourceDTO.getRouteResourceUrl();
             }
-            RequestBody body = RequestBody.create(fullHttpRequest.content().toString(CharsetUtil.UTF_8), MediaType.get("application/json; charset=utf-8"));
-            String resourceUrl = fullHttpRequest.uri();
+            Object content = requestHandlerDTO.getContent();
+            if (Objects.isNull(content) || !(content instanceof String)) {
+                content = JsonUtils.writeValueAsString(content);
+            }
+            RequestBody body = RequestBody.create(content.toString(), MediaType.get("application/json; charset=utf-8"));
             if (StringUtils.isNotEmpty(resourceDTO.getRouteResourceUrl())) {
                 resourceUrl = resourceDTO.getRouteResourceUrl();
             }
             String url = addres + resourceUrl;
-            Request request = new Request.Builder()
-                    .url(url)
-                    .post(body)
-                    .build();
+            Request request = new Request.Builder().url(url).post(body).build();
+            log.debug("OkHttpClient Request:{}", content);
             response = okHttpClientService.execute(request);
             String responseStr = null;
             if (Objects.nonNull(response.body())) {
                 responseStr = response.body().string();
             }
+            log.debug("OkHttpClient Response:{}", responseStr);
             log.debug("OkHttpClientComponentHandler Start Done");
             return responseStr;
         } catch (Exception e) {

@@ -1,0 +1,58 @@
+package pers.kagw.core.exception;
+
+import pers.kagw.core.common.JsonUtils;
+
+import java.util.Objects;
+
+/**
+ * @author kwsc98
+ */
+
+public enum ExceptionEnum implements ExceptionInfo {
+
+    /**
+     * ERROR
+     */
+    ERROR("9999", "Exception");
+
+    public final String code;
+
+    public final String infoStr;
+
+    ExceptionEnum(String code, String infoStr) {
+        this.code = code;
+        this.infoStr = infoStr;
+    }
+
+    @Override
+    public String getExceptionInfoStr() {
+        try {
+            return JsonUtils.writeValueAsString(Info.build(this));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static class Info {
+        public String code;
+
+        public String infoStr;
+
+        public static Info build(ExceptionEnum exceptionEnum) {
+            Info info = new Info();
+            if (Objects.nonNull(exceptionEnum)) {
+                info.code = exceptionEnum.code;
+                info.infoStr = exceptionEnum.infoStr;
+            }
+            return info;
+        }
+
+
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(ExceptionEnum.ERROR.getExceptionInfoStr());
+        ;
+    }
+}

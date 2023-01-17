@@ -79,7 +79,7 @@ public class ChannelService {
         HandlerService handlerService = this.kagwApplicationContext.getHandlerService();
         for (String handlerStr : handlerList) {
             String[] handler = handlerStr.split(":", 2);
-            ComponentHandler<Object, Object> componentHandler = handlerService.getComponentHandler(handler[0]);
+            ComponentHandler<?, ?> componentHandler = handlerService.getComponentHandler(handler[0]);
             if (Objects.nonNull(componentHandler)) {
                 ComponentNode componentNode = ComponentNode.build().setHandler(componentHandler).setConfigJsonStr(handler[0]);
                 if (handler.length > 1) {
