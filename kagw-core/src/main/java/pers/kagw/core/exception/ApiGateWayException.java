@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class ApiGateWayException extends RuntimeException {
 
-    ExceptionInfo exceptionInfo = null;
+    ExceptionInfo exceptionInfo = ExceptionEnum.ERROR;
 
     public ApiGateWayException() {
     }

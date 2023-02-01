@@ -19,14 +19,14 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpObje
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        log.info("Client Channel Connection: [{}] parent [{}]", ctx.channel(), ctx.channel().parent());
+        log.info("Client Channel Connection : [{}] parent [{}]", ctx.channel(), ctx.channel().parent());
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
         if (msg instanceof FullHttpResponse) {
             FullHttpResponse fullHttpResponse = (FullHttpResponse) msg;
-            log.info("HttpResponse Status: {}", fullHttpResponse.status());
+            log.info("HttpResponse Status : {}", fullHttpResponse.status());
             if (!HttpResponseStatus.OK.equals(fullHttpResponse.status())) {
                 throw new NettyHttpClientException(fullHttpResponse.status());
             }

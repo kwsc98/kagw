@@ -4,6 +4,8 @@ import lombok.Data;
 import pers.kagw.core.channel.Channel;
 import pers.kagw.core.common.LoadBalancer;
 
+import java.util.List;
+
 /**
  * @author kwsc98
  */
@@ -16,6 +18,10 @@ public class ResourceDTO {
     private String routeResourceUrl;
 
     private LoadBalancer loadBalancer;
+
+    private List<String> groupHandlerList;
+
+    private List<String> handlerList;
 
     public static ResourceDTO build(){
         return new ResourceDTO();
@@ -38,6 +44,16 @@ public class ResourceDTO {
 
     public ResourceDTO setRouteResourceUrl(String routeResourceUrl) {
         this.routeResourceUrl = routeResourceUrl;
+        return this;
+    }
+
+    public ResourceDTO setGroupHandlerList(List<String> groupHandlerList) {
+        this.groupHandlerList = groupHandlerList;
+        return this;
+    }
+
+    public ResourceDTO setHandlerList(List<String> handlerList) {
+        this.handlerList = handlerList;
         return this;
     }
 }

@@ -35,12 +35,17 @@ public class AutoConfig {
     public KagwApplicationContext init(KagwProperties kagwProperties) {
         log.info("Kagw Start Init");
         return KagwBuilderFactory.builder()
-                .setRegistryBuilderFactory(RegistryBuilderFactory.builder().setRegistryClientInfo(RegistryClientInfo.build(kagwProperties.getRegisteredPath())))
-                .setPort(kagwProperties.getPort()).build();
+                .setRegistryBuilderFactory(
+                        RegistryBuilderFactory.builder()
+                                .setRegistryClientInfo(
+                                        RegistryClientInfo.build(kagwProperties.getRegisteredPath())
+                                )
+                )
+                .setPort(kagwProperties.getPort()).build().init();
     }
 
     @Bean
-    @DependsOn({"krpcApplicationContext"})
+    @DependsOn({"KagwApplicationContext"})
     @ConditionalOnMissingBean
     public KagwPostProcessor dtpPostProcessor(@Qualifier("KagwApplicationContext") KagwApplicationContext kagwApplicationContext) {
         return new KagwPostProcessor(kagwApplicationContext);

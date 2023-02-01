@@ -1,25 +1,18 @@
 package pers.kagw.core.handler.impl;
 
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.DefaultEventLoop;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
-import pers.kagw.core.KagwApplicationContext;
-import pers.kagw.core.common.LoadBalancer;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.RequestComponentHandler;
 import pers.kagw.core.protocol.netty.NettyClient;
-
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
 
 /**
  * @author kwsc98

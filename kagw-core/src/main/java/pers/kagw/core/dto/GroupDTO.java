@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import pers.kagw.core.common.LoadBalancer;
 import pers.kagw.core.common.RandomLoadBalancer;
-import pers.kagw.core.common.WrrSmoothImpl;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ public class GroupDTO extends BaseDTO implements Serializable {
 
     public LoadBalancer getLoadBalancer() {
         if (Objects.isNull(routeList) || routeList.isEmpty()) {
-            log.error("GroupDTO: {} Init Error: RouteList Is Empty", getResourceName());
+            log.error("GroupDTO : {} Init Error : RouteList Is Empty", getResourceName());
         }
         return new RandomLoadBalancer().init(routeList);
     }

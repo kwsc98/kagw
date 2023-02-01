@@ -1,8 +1,6 @@
 package pers.kagw.core.handler.impl;
 
 import com.alibaba.nacos.common.utils.StringUtils;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -46,22 +44,19 @@ public class OkHttpClientComponentHandler extends RequestComponentHandler<Reques
                 content = JsonUtils.writeValueAsString(content);
             }
             RequestBody body = RequestBody.create(content.toString(), MediaType.get("application/json; charset=utf-8"));
-            if (StringUtils.isNotEmpty(resourceDTO.getRouteResourceUrl())) {
-                resourceUrl = resourceDTO.getRouteResourceUrl();
-            }
             String url = addres + resourceUrl;
             Request request = new Request.Builder().url(url).post(body).build();
-            log.debug("OkHttpClient Request:{}", content);
+            log.debug("OkHttpClient Request : {}", content);
             response = okHttpClientService.execute(request);
             String responseStr = null;
             if (Objects.nonNull(response.body())) {
                 responseStr = response.body().string();
             }
-            log.debug("OkHttpClient Response:{}", responseStr);
+            log.debug("OkHttpClient Response : {}", responseStr);
             log.debug("OkHttpClientComponentHandler Start Done");
             return responseStr;
         } catch (Exception e) {
-            log.error("OkHttpClientComponentHandler Error :{}", e.toString());
+            log.error("OkHttpClientComponentHandler Error : {}", e.toString(), e);
             throw new ApiGateWayException();
         } finally {
             if (Objects.nonNull(response)) {

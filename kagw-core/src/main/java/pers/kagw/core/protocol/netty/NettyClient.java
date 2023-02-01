@@ -50,7 +50,7 @@ public class NettyClient {
         }
         try {
             channel = this.bootstrap.connect(host, port).sync().channel();
-            log.info("Client Channel Create Done: {}", channel);
+            log.info("Client Channel Create Done : {}", channel);
             portMap.put(port, channel);
             return channel;
         } catch (Exception e) {

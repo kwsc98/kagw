@@ -13,7 +13,8 @@ public enum ExceptionEnum implements ExceptionInfo {
     /**
      * ERROR
      */
-    ERROR("9999", "Exception");
+    ERROR("9999", "Exception"),
+    RESOURCES_NOT_EXIST("9998", "Resources Not Exist");
 
     public final String code;
 
@@ -29,7 +30,7 @@ public enum ExceptionEnum implements ExceptionInfo {
         try {
             return JsonUtils.writeValueAsString(Info.build(this));
         } catch (Exception e) {
-            return null;
+            return "{}";
         }
     }
 
@@ -46,8 +47,6 @@ public enum ExceptionEnum implements ExceptionInfo {
             }
             return info;
         }
-
-
     }
 
 

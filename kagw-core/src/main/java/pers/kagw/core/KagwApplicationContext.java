@@ -43,8 +43,9 @@ public class KagwApplicationContext {
         }
     }
 
-    public void init() {
+    public KagwApplicationContext init() {
         this.registryService = registryBuilderFactory.init();
+        return this;
     }
 
 

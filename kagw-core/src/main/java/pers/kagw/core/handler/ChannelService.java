@@ -9,13 +9,10 @@ import pers.kagw.core.channel.ComponentChannel;
 import pers.kagw.core.channel.ComponentNode;
 import pers.kagw.core.common.LoadBalancer;
 import pers.kagw.core.common.Trie;
-import pers.kagw.core.common.WrrSmoothImpl;
-import pers.kagw.core.dto.BaseDTO;
 import pers.kagw.core.dto.GroupDTO;
 import pers.kagw.core.dto.InterfaceDTO;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
-import pers.kagw.core.handler.impl.NettyClientComponentHandler;
 import pers.kagw.core.handler.impl.OkHttpClientComponentHandler;
 
 import java.util.*;
@@ -29,44 +26,47 @@ public class ChannelService {
 
     private final KagwApplicationContext kagwApplicationContext;
 
-    private final Trie<ResourceDTO> resourceTrie;
+    private static final Trie<ResourceDTO>  RESOURCE_TRIE = new Trie<>();
 
     private final OkHttpClientComponentHandler okHttpClientComponentHandler;
 
     public ChannelService(KagwApplicationContext kagwApplicationContext) {
-        this.resourceTrie = new Trie<>();
+
         this.kagwApplicationContext = kagwApplicationContext;
         this.okHttpClientComponentHandler = new OkHttpClientComponentHandler();
     }
 
     public ResourceDTO getResource(String url) {
-        return this.resourceTrie.get(splitUrl(url));
+        return RESOURCE_TRIE.get(splitUrl(url));
     }
 
 
-    public synchronized void registrationGroup(GroupDTO groupDTO) {
-        log.info("GroupDTO :{} Start Registration", groupDTO.getResourceName());
+    public synchronized static void registrationGroup(GroupDTO groupDTO) {
+        log.info("GroupDTO : {} Start Registration", groupDTO.getResourceName());
         LoadBalancer loadBalancer = groupDTO.getLoadBalancer();
-        ResourceDTO groupResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer);
-        Channel groupChannel = getComponentChannel(null, groupDTO.getHandlerList(), groupResourceDTO);
-        groupResourceDTO.setChannel(groupChannel);
-        this.resourceTrie.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
+        ResourceDTO groupResourceDTO = ResourceDTO.build()
+                .setBaseDTO(groupDTO)
+                .setLoadBalancer(loadBalancer)
+                .setHandlerList(groupDTO.getHandlerList());
+        RESOURCE_TRIE.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
         List<InterfaceDTO> interfaceDTOList = groupDTO.getInterfaceDTOList();
         for (InterfaceDTO interfaceDTO : interfaceDTOList) {
             List<String> groupHandlerList = null;
             if (interfaceDTO.isGroupExtends()) {
                 groupHandlerList = groupDTO.getHandlerList();
             }
-            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer).setRouteResourceUrl(interfaceDTO.getResourceUrl());
-            Channel interfaceChannel = getComponentChannel(groupHandlerList, groupDTO.getHandlerList(), interfaceResourceDTO);
-            interfaceResourceDTO.setChannel(interfaceChannel);
-            this.resourceTrie.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
-
+            ResourceDTO interfaceResourceDTO = ResourceDTO.build()
+                    .setBaseDTO(groupDTO)
+                    .setLoadBalancer(loadBalancer)
+                    .setRouteResourceUrl(interfaceDTO.getRouteResourceUrl())
+                    .setGroupHandlerList(groupHandlerList)
+                    .setHandlerList(interfaceDTO.getHandlerList());
+            RESOURCE_TRIE.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
         }
-        log.info("GroupDTO :{} Registration Done", groupDTO.getResourceName());
+        log.info("GroupDTO : {} Registration Done", groupDTO.getResourceName());
     }
 
-    private Channel getComponentChannel(List<String> groupHandlerList, List<String> interfacehandlerList, ResourceDTO resourceDTO) {
+    public Channel getComponentChannel(List<String> groupHandlerList, List<String> interfacehandlerList, ResourceDTO resourceDTO) {
         List<String> handlerList = new ArrayList<>();
         if (Objects.nonNull(groupHandlerList) && !groupHandlerList.isEmpty()) {
             handlerList.addAll(groupHandlerList);
@@ -105,7 +105,7 @@ public class ChannelService {
         return componentChannel;
     }
 
-    private List<String> splitUrl(String url) {
+    private static List<String> splitUrl(String url) {
         if (StringUtils.isEmpty(url)) {
             log.error("Url is Empty SplitUrl Error");
             throw new ApiGateWayException();

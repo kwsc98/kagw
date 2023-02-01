@@ -1,7 +1,6 @@
 package pers.kagw.core;
 
 import pers.kagw.core.registry.RegistryBuilderFactory;
-import pers.kagw.core.registry.RegistryService;
 
 /**
  * @author kwsc98
@@ -29,7 +28,7 @@ public class KagwBuilderFactory {
     }
 
     public KagwApplicationContext build() {
-        return new KagwApplicationContext(this.registryBuilderFactory.build(),this.port);
+        return new KagwApplicationContext(this.registryBuilderFactory,this.port);
     }
 
 }
