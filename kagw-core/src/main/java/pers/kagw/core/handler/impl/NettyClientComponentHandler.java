@@ -11,6 +11,7 @@ import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.RequestComponentHandler;
 import pers.kagw.core.protocol.netty.NettyClient;
+
 import java.util.concurrent.TimeUnit;
 
 
@@ -45,7 +46,7 @@ public class NettyClientComponentHandler extends RequestComponentHandler<FullHtt
             log.debug("NettyClientComponentHandler Start Done");
             return object;
         } catch (Exception e) {
-            log.error("NettyClientComponentHandler Error", e);
+            log.error("NettyClientComponentHandler Error : {}", e.toString(), e);
             throw new ApiGateWayException();
         }
 

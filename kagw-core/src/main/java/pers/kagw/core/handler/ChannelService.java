@@ -16,6 +16,7 @@ import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.impl.OkHttpClientComponentHandler;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -26,29 +27,46 @@ public class ChannelService {
 
     private final KagwApplicationContext kagwApplicationContext;
 
-    private static final Trie<ResourceDTO>  RESOURCE_TRIE = new Trie<>();
+    private Trie<ResourceDTO> resourceTrie = new Trie<>();
+    private ConcurrentHashMap<String, ResourceDTO> concurrentHashMap = new ConcurrentHashMap<>();
 
     private final OkHttpClientComponentHandler okHttpClientComponentHandler;
 
     public ChannelService(KagwApplicationContext kagwApplicationContext) {
-
         this.kagwApplicationContext = kagwApplicationContext;
         this.okHttpClientComponentHandler = new OkHttpClientComponentHandler();
     }
 
     public ResourceDTO getResource(String url) {
-        return RESOURCE_TRIE.get(splitUrl(url));
+        ResourceDTO resourceDTO = this.concurrentHashMap.get(url);
+        if (Objects.nonNull(resourceDTO)) {
+            return resourceDTO;
+        }
+        resourceDTO = this.resourceTrie.get(splitUrl(url));
+        if (Objects.nonNull(resourceDTO)) {
+            this.concurrentHashMap.put(url, resourceDTO);
+        }
+        return resourceDTO;
     }
 
 
-    public synchronized static void registrationGroup(GroupDTO groupDTO) {
+    public synchronized void registrationGroupList(List<GroupDTO> groupDTOList) {
+        Trie<ResourceDTO> resourceTrie = new Trie<>();
+        for (GroupDTO groupDTO : groupDTOList) {
+            registrationGroup(resourceTrie, groupDTO);
+        }
+        this.resourceTrie = resourceTrie;
+        this.concurrentHashMap = new ConcurrentHashMap<>();
+    }
+
+    public void registrationGroup(Trie<ResourceDTO> resourceTrie, GroupDTO groupDTO) {
         log.info("GroupDTO : {} Start Registration", groupDTO.getResourceName());
         LoadBalancer loadBalancer = groupDTO.getLoadBalancer();
         ResourceDTO groupResourceDTO = ResourceDTO.build()
                 .setBaseDTO(groupDTO)
                 .setLoadBalancer(loadBalancer)
                 .setHandlerList(groupDTO.getHandlerList());
-        RESOURCE_TRIE.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
+        resourceTrie.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
         List<InterfaceDTO> interfaceDTOList = groupDTO.getInterfaceDTOList();
         for (InterfaceDTO interfaceDTO : interfaceDTOList) {
             List<String> groupHandlerList = null;
@@ -61,7 +79,7 @@ public class ChannelService {
                     .setRouteResourceUrl(interfaceDTO.getRouteResourceUrl())
                     .setGroupHandlerList(groupHandlerList)
                     .setHandlerList(interfaceDTO.getHandlerList());
-            RESOURCE_TRIE.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
+            resourceTrie.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
         }
         log.info("GroupDTO : {} Registration Done", groupDTO.getResourceName());
     }

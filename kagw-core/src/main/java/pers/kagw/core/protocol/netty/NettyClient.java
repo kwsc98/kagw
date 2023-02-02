@@ -54,7 +54,7 @@ public class NettyClient {
             portMap.put(port, channel);
             return channel;
         } catch (Exception e) {
-            log.error("Client Channel Create Error", e);
+            log.error("Client Channel Create Error : {}", e.toString(), e);
             throw new RuntimeException();
         }
     }

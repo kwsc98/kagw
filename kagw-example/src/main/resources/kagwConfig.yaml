@@ -1,0 +1,17 @@
+group:
+  - resourceName: resource1
+    resourceUrl: /resource1
+    timeOut: 3000
+    handlerList:
+      - dsd
+    routeList:
+      - addres: http://127.0.0.1:8083
+        weight: 1
+    interfaceDTOList:
+      - resourceName: interface1
+        resourceUrl: /interface1
+        timeOut: 3000
+        handlerList:
+          - sdsd
+        groupExtends: true
+        routeResourceUrl: /test2wws2

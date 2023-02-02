@@ -1,6 +1,7 @@
 package pers.kagw.core.registry;
 
 
+import pers.kagw.core.handler.ChannelService;
 import pers.kagw.core.registry.impl.NacosClient;
 import pers.kagw.core.registry.impl.ZookeeperClient;
 
@@ -19,11 +20,11 @@ public class RegistryBuilderFactory {
     }
 
 
-    public RegistryService init() {
+    public RegistryService init(ChannelService channelService) {
         RegistryService registryService = null;
         switch (registryClientInfo.getClient()) {
             case Nacos:
-                registryService = RegistryService.build(new NacosClient());
+                registryService = RegistryService.build(new NacosClient(channelService));
                 break;
             case Zookeeper:
                 registryService = RegistryService.build(new ZookeeperClient());

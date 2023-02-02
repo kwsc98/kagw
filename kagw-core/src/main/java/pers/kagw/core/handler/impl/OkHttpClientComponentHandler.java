@@ -10,6 +10,7 @@ import pers.kagw.core.common.JsonUtils;
 import pers.kagw.core.dto.RequestHandlerDTO;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
+import pers.kagw.core.exception.ExceptionEnum;
 import pers.kagw.core.handler.RequestComponentHandler;
 import pers.kagw.core.protocol.okhttp.OkHttpClientService;
 
@@ -48,6 +49,10 @@ public class OkHttpClientComponentHandler extends RequestComponentHandler<Reques
             Request request = new Request.Builder().url(url).post(body).build();
             log.debug("OkHttpClient Request : {}", content);
             response = okHttpClientService.execute(request);
+            if (!response.isSuccessful()) {
+                log.info("Request Not Successful Response Status : {}  : {}", response.code(), response);
+                throw new ApiGateWayException(ExceptionEnum.ERROR);
+            }
             String responseStr = null;
             if (Objects.nonNull(response.body())) {
                 responseStr = response.body().string();
@@ -57,6 +62,9 @@ public class OkHttpClientComponentHandler extends RequestComponentHandler<Reques
             return responseStr;
         } catch (Exception e) {
             log.error("OkHttpClientComponentHandler Error : {}", e.toString(), e);
+            if (e instanceof ApiGateWayException) {
+                throw (ApiGateWayException) e;
+            }
             throw new ApiGateWayException();
         } finally {
             if (Objects.nonNull(response)) {
