@@ -6,7 +6,9 @@ group:
       - dsd
     routeList:
       - addres: http://127.0.0.1:8083
-        weight: 1
+        weight: 0
+      - addres: http://127.0.0.2:8084
+        weight: 10
     interfaceDTOList:
       - resourceName: interface1
         resourceUrl: /interface1
@@ -14,4 +16,4 @@ group:
         handlerList:
           - sdsd
         groupExtends: true
-        routeResourceUrl: /test2wws2
+        routeResourceUrl: /test

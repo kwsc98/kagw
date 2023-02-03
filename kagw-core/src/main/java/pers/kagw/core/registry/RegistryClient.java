@@ -1,6 +1,8 @@
 package pers.kagw.core.registry;
 
 
+import java.io.FileNotFoundException;
+
 /**
  * kagw注册中心接口
  * 2022/7/28 15:53

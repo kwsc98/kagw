@@ -2,6 +2,7 @@ package pers.kagw.core.registry;
 
 
 import pers.kagw.core.handler.ChannelService;
+import pers.kagw.core.registry.impl.ConfigurationClient;
 import pers.kagw.core.registry.impl.NacosClient;
 import pers.kagw.core.registry.impl.ZookeeperClient;
 
@@ -28,6 +29,9 @@ public class RegistryBuilderFactory {
                 break;
             case Zookeeper:
                 registryService = RegistryService.build(new ZookeeperClient());
+                break;
+            case Configuration:
+                registryService = RegistryService.build(new ConfigurationClient(channelService));
                 break;
             default:
                 throw new RuntimeException();
