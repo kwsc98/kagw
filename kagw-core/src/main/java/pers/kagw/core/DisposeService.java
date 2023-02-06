@@ -37,7 +37,7 @@ public class DisposeService {
         if (Objects.isNull(resourceDTO.getChannel())) {
             Channel channel = kagwApplicationContext
                     .getChannelService()
-                    .getComponentChannel(resourceDTO.getGroupHandlerList(), resourceDTO.getHandlerList(), resourceDTO);
+                    .getComponentChannel(resourceDTO);
             resourceDTO.setChannel(channel);
         }
         Channel componentChannel = resourceDTO.getChannel();

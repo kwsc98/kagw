@@ -36,10 +36,7 @@ public class OkHttpClientComponentHandler extends RequestComponentHandler<Reques
         Response response = null;
         try {
             String addres = resourceDTO.getLoadBalancer().next();
-            String resourceUrl = requestHandlerDTO.getResourceUrl();
-            if (StringUtils.isNotEmpty(resourceDTO.getRouteResourceUrl())) {
-                resourceUrl = resourceDTO.getRouteResourceUrl();
-            }
+            String resourceUrl = resourceDTO.getRouteResourceUrl(requestHandlerDTO.getResourceUrl());
             Object content = requestHandlerDTO.getContent();
             if (Objects.isNull(content) || !(content instanceof String)) {
                 content = JsonUtils.writeValueAsString(content);

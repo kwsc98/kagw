@@ -1,6 +1,7 @@
 package pers.kagw.core.dto;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import pers.kagw.core.channel.Channel;
 import pers.kagw.core.common.LoadBalancer;
 
@@ -23,7 +24,18 @@ public class ResourceDTO {
 
     private List<String> handlerList;
 
-    public static ResourceDTO build(){
+    public String getRouteResourceUrl(String resourceUrl) {
+        String res = resourceUrl;
+        String baseResourceUrl = baseDTO.getResourceUrl();
+        if (StringUtils.isNotEmpty(routeResourceUrl) &&
+                resourceUrl.indexOf(baseResourceUrl) == 0) {
+            res = resourceUrl.replaceFirst(baseResourceUrl, routeResourceUrl);
+        }
+        return res;
+    }
+
+
+    public static ResourceDTO build() {
         return new ResourceDTO();
     }
 

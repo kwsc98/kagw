@@ -74,7 +74,7 @@ public class ChannelService {
                 groupHandlerList = groupDTO.getHandlerList();
             }
             ResourceDTO interfaceResourceDTO = ResourceDTO.build()
-                    .setBaseDTO(groupDTO)
+                    .setBaseDTO(interfaceDTO)
                     .setLoadBalancer(loadBalancer)
                     .setRouteResourceUrl(interfaceDTO.getRouteResourceUrl())
                     .setGroupHandlerList(groupHandlerList)
@@ -84,7 +84,9 @@ public class ChannelService {
         log.info("GroupDTO : {} Registration Done", groupDTO.getResourceName());
     }
 
-    public Channel getComponentChannel(List<String> groupHandlerList, List<String> interfacehandlerList, ResourceDTO resourceDTO) {
+    public Channel getComponentChannel(ResourceDTO resourceDTO) {
+        List<String> groupHandlerList = resourceDTO.getGroupHandlerList();
+        List<String> interfacehandlerList = resourceDTO.getHandlerList();
         List<String> handlerList = new ArrayList<>();
         if (Objects.nonNull(groupHandlerList) && !groupHandlerList.isEmpty()) {
             handlerList.addAll(groupHandlerList);

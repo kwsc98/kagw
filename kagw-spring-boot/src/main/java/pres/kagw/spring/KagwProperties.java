@@ -17,6 +17,6 @@ public class KagwProperties {
 
     private String registeredPath;
 
-    private int port;
+    private int port = 8080;
 
 }
