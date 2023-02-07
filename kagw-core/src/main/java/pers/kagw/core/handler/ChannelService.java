@@ -51,6 +51,17 @@ public class ChannelService {
 
 
     public synchronized void registrationGroupList(List<GroupDTO> groupDTOList) {
+        for (GroupDTO groupDTO : groupDTOList) {
+            if (groupDTO.getTimeOut() == -1) {
+                groupDTO.setTimeOut(3000);
+            }
+            List<InterfaceDTO> interfaceDTOList = groupDTO.getInterfaceDTOList();
+            for (InterfaceDTO interfaceDTO : interfaceDTOList) {
+                if (interfaceDTO.getTimeOut() == -1) {
+                    interfaceDTO.setTimeOut(groupDTO.getTimeOut());
+                }
+            }
+        }
         Trie<ResourceDTO> resourceTrie = new Trie<>();
         for (GroupDTO groupDTO : groupDTOList) {
             registrationGroup(resourceTrie, groupDTO);
@@ -96,6 +107,7 @@ public class ChannelService {
         }
         List<ComponentNode> requestComponentNodeList = new ArrayList<>();
         List<ComponentNode> responseComponentNodeList = new ArrayList<>();
+        ComponentHandler<?,?> baseComponentHandler = this.okHttpClientComponentHandler;
         HandlerService handlerService = this.kagwApplicationContext.getHandlerService();
         for (String handlerStr : handlerList) {
             String[] handler = handlerStr.split(":", 2);
@@ -109,6 +121,8 @@ public class ChannelService {
                     requestComponentNodeList.add(componentNode);
                 } else if (componentHandler instanceof ResponseComponentHandler) {
                     responseComponentNodeList.add(componentNode);
+                }else if(componentHandler instanceof BaseComponentHandler){
+                    baseComponentHandler = componentHandler;
                 }
             }
         }
@@ -117,8 +131,8 @@ public class ChannelService {
         for (ComponentNode componentNode : requestComponentNodeList) {
             channelPipeline.addLast(componentNode);
         }
-        ComponentNode nettyClientComponentNode = ComponentNode.build().setHandler(this.okHttpClientComponentHandler).setConfigObject(resourceDTO);
-        channelPipeline.addLast(nettyClientComponentNode);
+        ComponentNode baseComponentNode = ComponentNode.build().setHandler(baseComponentHandler).setConfigObject(resourceDTO);
+        channelPipeline.addLast(baseComponentNode);
         for (ComponentNode componentNode : responseComponentNodeList) {
             channelPipeline.addLast(componentNode);
         }

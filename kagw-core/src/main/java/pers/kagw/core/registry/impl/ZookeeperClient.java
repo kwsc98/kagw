@@ -11,6 +11,7 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import pers.kagw.core.dto.GroupDTO;
 import pers.kagw.core.registry.RegistryClient;
 import pers.kagw.core.registry.RegistryClientInfo;
 
@@ -31,14 +32,12 @@ import java.util.stream.Collectors;
 public class ZookeeperClient implements RegistryClient, CuratorCacheListener, ConnectionStateListener {
 
 
-    private CuratorFramework curatorFramework;
-
     @Override
     public void init(RegistryClientInfo registryClientInfo) {
         try {
             log.info("开始初始化zookeeper注册中心");
             //创建curator客户端
-            this.curatorFramework = CuratorFrameworkFactory.newClient(registryClientInfo.getServerAddr(), 5000, 20000, new ExponentialBackoffRetry(1000, 100));
+            CuratorFramework curatorFramework = CuratorFrameworkFactory.newClient(registryClientInfo.getServerAddr(), 5000, 20000, new ExponentialBackoffRetry(1000, 100));
             curatorFramework.start();
             if (curatorFramework.checkExists().forPath("/" + ROOT_PATH) == null) {
                 curatorFramework.create().creatingParentsIfNeeded().forPath("/" + ROOT_PATH);
@@ -53,6 +52,11 @@ public class ZookeeperClient implements RegistryClient, CuratorCacheListener, Co
             log.error(e.toString());
             throw new RuntimeException();
         }
+    }
+
+    @Override
+    public void doRefresh(List<GroupDTO> list) {
+
     }
 
     @Override

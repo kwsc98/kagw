@@ -14,7 +14,7 @@ public class BaseDTO {
 
     private String resourceUrl;
 
-    private long timeOut = 3000;
+    private long timeOut = -1;
 
     private List<String> handlerList;
 

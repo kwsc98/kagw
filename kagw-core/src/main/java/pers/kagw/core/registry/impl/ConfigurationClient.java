@@ -1,7 +1,6 @@
 package pers.kagw.core.registry.impl;
 
 
-import com.alibaba.nacos.common.utils.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -9,7 +8,6 @@ import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.yaml.snakeyaml.Yaml;
 import pers.kagw.core.common.JsonUtils;
-import pers.kagw.core.common.utils.FileUtil;
 import pers.kagw.core.dto.GroupDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.ChannelService;
@@ -26,9 +24,6 @@ import java.util.Map;
  */
 @Slf4j
 public class ConfigurationClient extends FileAlterationListenerAdaptor implements RegistryClient {
-
-
-    private FileAlterationMonitor monitor;
 
 
     private final ChannelService channelService;
@@ -48,7 +43,8 @@ public class ConfigurationClient extends FileAlterationListenerAdaptor implement
         String[] pathArray = filePath.split("/");
         configFileName = pathArray[pathArray.length - 1];
         File file = new File(filePath);
-        doRefresh(file);
+        List<GroupDTO> list = getGroupDTOList(file);
+        doRefresh(list);
         StringBuilder stringBuilder = new StringBuilder("/");
         for (int i = 0; i < pathArray.length - 1; i++) {
             stringBuilder.append(pathArray[i]).append("/");
@@ -57,14 +53,20 @@ public class ConfigurationClient extends FileAlterationListenerAdaptor implement
         log.info("ConfigurationClient Init Done");
     }
 
-    private void doRefresh(File file) {
+
+    @Override
+    public void doRefresh(List<GroupDTO> list) {
+        channelService.registrationGroupList(list);
+    }
+
+
+    private List<GroupDTO> getGroupDTOList(File file){
         try {
             Map<String, Object> map = new Yaml().load(new FileReader(file));
             Object group = map.get("group");
             String json = JsonUtils.writeValueAsString(group);
-            List<GroupDTO> list = JsonUtils.readValue(json, new TypeReference<List<GroupDTO>>() {
+            return JsonUtils.readValue(json, new TypeReference<List<GroupDTO>>() {
             });
-            channelService.registrationGroupList(list);
         } catch (Exception e) {
             log.error("registrationGroupList Error : {}", e.toString(), e);
             throw new RuntimeException();
@@ -75,7 +77,7 @@ public class ConfigurationClient extends FileAlterationListenerAdaptor implement
         try {
             FileAlterationObserver observer = new FileAlterationObserver(new File(filePath));
             observer.addListener(this);
-            monitor = new FileAlterationMonitor(1000, observer);
+            FileAlterationMonitor monitor = new FileAlterationMonitor(1000, observer);
             monitor.start();
         } catch (Exception e) {
             log.error("ConfigurationClient Monitor Error");
@@ -95,7 +97,8 @@ public class ConfigurationClient extends FileAlterationListenerAdaptor implement
             return;
         }
         log.info("ConfigurationClient Monitor Change Start");
-        doRefresh(file);
+        List<GroupDTO> list = getGroupDTOList(file);
+        doRefresh(list);
         log.info("ConfigurationClient Monitor Change Done");
     }
 

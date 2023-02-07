@@ -20,6 +20,7 @@ import org.yaml.snakeyaml.Yaml;
 import pers.kagw.core.KagwApplicationContext;
 import pers.kagw.core.common.JsonUtils;
 import pers.kagw.core.dto.GroupDTO;
+import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.ChannelService;
 import pers.kagw.core.registry.RegistryClient;
 import pers.kagw.core.registry.RegistryClientInfo;
@@ -51,25 +52,17 @@ public class NacosClient implements RegistryClient, Listener {
             properties.put("serverAddr", registryClientInfo.getServerAddr());
             ConfigService configService = NacosFactory.createConfigService(properties);
             String yamlStr = configService.getConfigAndSignListener("kagw", "kagw_group", 5000, this);
-            doRefresh(yamlStr);
+            List<GroupDTO> list = getGroupDTOList(yamlStr);
+            doRefresh(list);
             log.info("NacosClient Init Done");
         } catch (Exception e) {
             log.error("NacosClient Init Error : {}", e.toString(), e);
         }
     }
 
-    private void doRefresh(String configInfo) {
-        try {
-            Map<String, Object> map = new Yaml().load(configInfo);
-            Object group = map.get("group");
-            String json = JsonUtils.writeValueAsString(group);
-            List<GroupDTO> list = JsonUtils.readValue(json, new TypeReference<List<GroupDTO>>() {
-            });
-            channelService.registrationGroupList(list);
-        } catch (Exception e) {
-            log.error("registrationGroupList Error : {}", e.toString(), e);
-            throw new RuntimeException();
-        }
+    @Override
+    public void doRefresh(List<GroupDTO> list) {
+        channelService.registrationGroupList(list);
     }
 
 
@@ -81,7 +74,22 @@ public class NacosClient implements RegistryClient, Listener {
     @Override
     public void receiveConfigInfo(String configInfo) {
         log.info("NacosClient Monitor Change Start");
-        doRefresh(configInfo);
+        List<GroupDTO> list = getGroupDTOList(configInfo);
+        doRefresh(list);
         log.info("NacosClient Monitor Change Done");
     }
+
+    private List<GroupDTO> getGroupDTOList(String configInfo) {
+        try {
+            Map<String, Object> map = new Yaml().load(configInfo);
+            Object group = map.get("group");
+            String json = JsonUtils.writeValueAsString(group);
+            return JsonUtils.readValue(json, new TypeReference<List<GroupDTO>>() {
+            });
+        } catch (Exception e) {
+            log.error("Build GroupList Error : {}", e.toString(), e);
+            throw new ApiGateWayException();
+        }
+    }
+
 }

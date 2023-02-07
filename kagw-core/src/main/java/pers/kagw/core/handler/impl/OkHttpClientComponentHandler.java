@@ -11,6 +11,7 @@ import pers.kagw.core.dto.RequestHandlerDTO;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.exception.ExceptionEnum;
+import pers.kagw.core.handler.BaseComponentHandler;
 import pers.kagw.core.handler.RequestComponentHandler;
 import pers.kagw.core.protocol.okhttp.OkHttpClientService;
 
@@ -20,7 +21,7 @@ import java.util.Objects;
  * @author kwsc98
  */
 @Slf4j
-public class OkHttpClientComponentHandler extends RequestComponentHandler<RequestHandlerDTO<Object>, ResourceDTO> {
+public class OkHttpClientComponentHandler extends BaseComponentHandler<RequestHandlerDTO<Object>, ResourceDTO> {
 
 
     private final OkHttpClientService okHttpClientService;

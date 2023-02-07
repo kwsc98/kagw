@@ -9,7 +9,7 @@ import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
-import pers.kagw.core.handler.RequestComponentHandler;
+import pers.kagw.core.handler.BaseComponentHandler;
 import pers.kagw.core.protocol.netty.NettyClient;
 
 import java.util.concurrent.TimeUnit;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * @author kwsc98
  */
 @Slf4j
-public class NettyClientComponentHandler extends RequestComponentHandler<FullHttpRequest, ResourceDTO> {
+public class NettyClientComponentHandler extends BaseComponentHandler<FullHttpRequest, ResourceDTO> {
 
     private final NettyClient nettyClient;
 
