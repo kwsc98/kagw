@@ -1,6 +1,9 @@
-package pres.kagw.example.cache.redis;
+package pres.kagw.example.configuration;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
@@ -9,29 +12,35 @@ import org.springframework.data.redis.connection.lettuce.LettucePoolingClientCon
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import pres.kagw.example.config.AppLicationConfig;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 
 /**
  * @author kwsc98
  */
-public class RedisUtils {
+@Configuration
+public class RedisConfiguration {
 
+    @Resource
+    private AppLicationConfig appLicationConfig;
 
-    public static <K, V> RedisTemplate<K, V> redisCacheTemplate(String redisHost, int redisPort, String redisPassword, int redisDatabase) {
-        RedisTemplate<K, V> template = new RedisTemplate<>();
+    @Bean("redisTokenCacheTemplate")
+    public RedisTemplate<String, String> redisCacheTemplate(@Qualifier("redisTokenLettuceConnectionFactory")LettuceConnectionFactory lettuceConnectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.setConnectionFactory(initLettuceConnectionFactory(redisHost, redisPort, redisPassword, redisDatabase));
+        template.setConnectionFactory(lettuceConnectionFactory);
         return template;
     }
 
-
-    public static LettuceConnectionFactory initLettuceConnectionFactory(String redisHost, int redisPort, String redisPassword, int redisDatabase) {
+    @Bean("redisTokenLettuceConnectionFactory")
+    public LettuceConnectionFactory initLettuceConnectionFactory() {
         //redis配置
-        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
-        redisConfiguration.setDatabase(redisDatabase);
-        redisConfiguration.setPassword(RedisPassword.of(redisPassword));
+        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration(appLicationConfig.getRedisHost(), appLicationConfig.getRedisPort());
+        redisConfiguration.setDatabase(appLicationConfig.getRedisDatabase());
+        redisConfiguration.setPassword(RedisPassword.of(appLicationConfig.getRedisPassword()));
         //连接池配置
         GenericObjectPoolConfig<?> genericObjectPoolConfig = new GenericObjectPoolConfig<>();
         genericObjectPoolConfig.setMaxIdle(16);

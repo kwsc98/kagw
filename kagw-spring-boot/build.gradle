@@ -1,4 +1,4 @@
 dependencies {
-    implementation project(':kagw-core')
+    api project(':kagw-core')
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }

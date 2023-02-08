@@ -73,10 +73,7 @@ public class ChannelService {
     public void registrationGroup(Trie<ResourceDTO> resourceTrie, GroupDTO groupDTO) {
         log.info("GroupDTO : {} Start Registration", groupDTO.getResourceName());
         LoadBalancer loadBalancer = groupDTO.getLoadBalancer();
-        ResourceDTO groupResourceDTO = ResourceDTO.build()
-                .setBaseDTO(groupDTO)
-                .setLoadBalancer(loadBalancer)
-                .setHandlerList(groupDTO.getHandlerList());
+        ResourceDTO groupResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer).setHandlerList(groupDTO.getHandlerList());
         resourceTrie.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
         List<InterfaceDTO> interfaceDTOList = groupDTO.getInterfaceDTOList();
         for (InterfaceDTO interfaceDTO : interfaceDTOList) {
@@ -84,12 +81,7 @@ public class ChannelService {
             if (interfaceDTO.isGroupExtends()) {
                 groupHandlerList = groupDTO.getHandlerList();
             }
-            ResourceDTO interfaceResourceDTO = ResourceDTO.build()
-                    .setBaseDTO(interfaceDTO)
-                    .setLoadBalancer(loadBalancer)
-                    .setRouteResourceUrl(interfaceDTO.getRouteResourceUrl())
-                    .setGroupHandlerList(groupHandlerList)
-                    .setHandlerList(interfaceDTO.getHandlerList());
+            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(interfaceDTO).setLoadBalancer(loadBalancer).setRouteResourceUrl(interfaceDTO.getRouteResourceUrl()).setGroupHandlerList(groupHandlerList).setHandlerList(interfaceDTO.getHandlerList());
             resourceTrie.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
         }
         log.info("GroupDTO : {} Registration Done", groupDTO.getResourceName());
@@ -107,22 +99,27 @@ public class ChannelService {
         }
         List<ComponentNode> requestComponentNodeList = new ArrayList<>();
         List<ComponentNode> responseComponentNodeList = new ArrayList<>();
-        ComponentHandler<?,?> baseComponentHandler = this.okHttpClientComponentHandler;
+        ComponentNode baseComponentNode = ComponentNode.build().setHandler(this.okHttpClientComponentHandler).setConfigObject(resourceDTO);
         HandlerService handlerService = this.kagwApplicationContext.getHandlerService();
         for (String handlerStr : handlerList) {
             String[] handler = handlerStr.split(":", 2);
             ComponentHandler<?, ?> componentHandler = handlerService.getComponentHandler(handler[0]);
             if (Objects.nonNull(componentHandler)) {
-                ComponentNode componentNode = ComponentNode.build().setHandler(componentHandler).setConfigJsonStr(handler[0]);
+                ComponentNode componentNode = ComponentNode.build().setHandler(componentHandler);
                 if (handler.length > 1) {
                     componentNode.setConfigJsonStr(handler[1]);
+                } else {
+                    componentNode.setConfigJsonStr(null);
                 }
                 if (componentHandler instanceof RequestComponentHandler) {
                     requestComponentNodeList.add(componentNode);
                 } else if (componentHandler instanceof ResponseComponentHandler) {
                     responseComponentNodeList.add(componentNode);
-                }else if(componentHandler instanceof BaseComponentHandler){
-                    baseComponentHandler = componentHandler;
+                } else if (componentHandler instanceof BaseComponentHandler) {
+                    if(Objects.isNull(componentNode.getConfigObject())){
+                        componentNode.setConfigObject(resourceDTO);
+                    }
+                    baseComponentNode = componentNode;
                 }
             }
         }
@@ -131,7 +128,6 @@ public class ChannelService {
         for (ComponentNode componentNode : requestComponentNodeList) {
             channelPipeline.addLast(componentNode);
         }
-        ComponentNode baseComponentNode = ComponentNode.build().setHandler(baseComponentHandler).setConfigObject(resourceDTO);
         channelPipeline.addLast(baseComponentNode);
         for (ComponentNode componentNode : responseComponentNodeList) {
             channelPipeline.addLast(componentNode);

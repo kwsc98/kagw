@@ -1,19 +1,15 @@
 group:
-  - resourceName: resource1
-    resourceUrl: /resource1
+  - resourceName: TestResource
+    resourceUrl: /kapi/test
     timeOut: 3000
-    handlerList:
-      - dsd
     routeList:
       - addres: http://127.0.0.1:8083
         weight: 1
       - addres: http://127.0.0.2:8084
         weight: 0
     interfaceDTOList:
-      - resourceName: interface1
-        resourceUrl: /interface1
-        timeOut: 3000
+      - resourceName: GetTokenInterface
+        resourceUrl: /kapi/test/getToken
         handlerList:
-          - sdsd
+          - TokenBaseComponent:20
         groupExtends: true
-        routeResourceUrl: /test

@@ -10,7 +10,7 @@ import pers.kagw.core.handler.BaseComponentHandler;
  */
 @Component("MockComponent")
 @Slf4j
-public class MockComponent extends BaseComponentHandler<RequestHandlerDTO<Object>, Object> {
+public class MockBaseComponent extends BaseComponentHandler<RequestHandlerDTO<Object>, Object> {
 
     @Override
     public Object handle(RequestHandlerDTO<Object> object, Object config) {
