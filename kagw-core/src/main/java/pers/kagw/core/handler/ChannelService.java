@@ -73,7 +73,7 @@ public class ChannelService {
     public void registrationGroup(Trie<ResourceDTO> resourceTrie, GroupDTO groupDTO) {
         log.info("GroupDTO : {} Start Registration", groupDTO.getResourceName());
         LoadBalancer loadBalancer = groupDTO.getLoadBalancer();
-        ResourceDTO groupResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer).setHandlerList(groupDTO.getHandlerList());
+        ResourceDTO groupResourceDTO = ResourceDTO.build().setBaseDTO(groupDTO).setLoadBalancer(loadBalancer).setRouteResourceUrl(groupDTO.getRouteResourceUrl()).setHandlerList(groupDTO.getHandlerList());
         resourceTrie.put(splitUrl(groupDTO.getResourceUrl()), groupResourceDTO);
         List<InterfaceDTO> interfaceDTOList = groupDTO.getInterfaceDTOList();
         for (InterfaceDTO interfaceDTO : interfaceDTOList) {
