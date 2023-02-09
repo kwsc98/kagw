@@ -14,6 +14,8 @@ public class BaseDTO {
 
     private String resourceUrl;
 
+    private String routeResourceUrl;
+
     private long timeOut = -1;
 
     private List<String> handlerList;

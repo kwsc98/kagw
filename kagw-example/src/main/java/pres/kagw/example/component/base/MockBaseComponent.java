@@ -8,7 +8,7 @@ import pers.kagw.core.handler.BaseComponentHandler;
 /**
  * @author kwsc98
  */
-@Component("MockComponent")
+@Component("MockBaseComponent")
 @Slf4j
 public class MockBaseComponent extends BaseComponentHandler<RequestHandlerDTO<Object>, Object> {
 

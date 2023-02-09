@@ -48,7 +48,6 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
                 //获取请求路径、请求体、请求方法
                 String url = httpRequest.uri();
                 String content = httpRequest.content().toString(CharsetUtil.UTF_8);
-                content = JsonUtils.formatJsonStr(content);
                 HttpMethod method = httpRequest.method();
                 RequestHandlerDTO<Object> requestHandlerDTO = RequestHandlerDTO.build().setContent(content).setResourceUrl(url).setHttpMethod(method);
                 log.info("Request Url : {} ,Content : {} ,Method : {} ", url, content, method);

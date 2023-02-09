@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import pers.kagw.core.exception.ApiGateWayException;
+import pers.kagw.core.exception.ExceptionEnum;
 
 import java.util.List;
 
@@ -14,30 +16,55 @@ public class JsonUtils {
 
     private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
-    public static <T> T readValue(byte[] bytes, Class<T> clazz) throws Exception {
-        return JSON_MAPPER.readValue(bytes, clazz);
+    public static <T> T readValue(byte[] bytes, Class<T> clazz) {
+        try {
+            return JSON_MAPPER.readValue(bytes, clazz);
+        } catch (Exception e) {
+            throw new ApiGateWayException(ExceptionEnum.ERROR);
+        }
     }
 
-    public static <T> T readValue(String jsonStr, Class<T> clazz) throws Exception {
-        return JSON_MAPPER.readValue(jsonStr, clazz);
+    public static <T> T readValue(String jsonStr, Class<T> clazz) {
+        try {
+            return JSON_MAPPER.readValue(jsonStr, clazz);
+        } catch (Exception e) {
+            throw new ApiGateWayException(ExceptionEnum.ERROR);
+        }
     }
 
-    public static <T> T readValue(String jsonStr, TypeReference<T> typeReference) throws Exception {
-        return JSON_MAPPER.readValue(jsonStr, typeReference);
-    }
-
-
-    public static byte[] writeValueAsBytes(Object object) throws Exception {
-        return JSON_MAPPER.writeValueAsBytes(object);
-    }
-
-    public static String formatJsonStr(String jsonStr) throws JsonProcessingException {
-        return JSON_MAPPER.writeValueAsString(JSON_MAPPER.readValue(jsonStr, Object.class));
-    }
-
-    public static String writeValueAsString(Object object) throws JsonProcessingException {
-        return JSON_MAPPER.writeValueAsString(object);
+    public static <T> T readValue(String jsonStr, TypeReference<T> typeReference) {
+        try {
+            return JSON_MAPPER.readValue(jsonStr, typeReference);
+        } catch (Exception e) {
+            throw new ApiGateWayException(ExceptionEnum.ERROR);
+        }
     }
 
 
+    public static byte[] writeValueAsBytes(Object object) {
+        try {
+            return JSON_MAPPER.writeValueAsBytes(object);
+        } catch (Exception e) {
+            throw new ApiGateWayException(ExceptionEnum.ERROR);
+        }
+    }
+
+    public static String formatJsonStr(String jsonStr) {
+        try {
+            return JSON_MAPPER.writeValueAsString(JSON_MAPPER.readValue(jsonStr, Object.class));
+        } catch (Exception e) {
+            throw new ApiGateWayException(ExceptionEnum.ERROR);
+        }
+    }
+
+    public static String writeValueAsString(Object object) {
+        try {
+            return JSON_MAPPER.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new ApiGateWayException(ExceptionEnum.ERROR);
+        }
+    }
 }
+
+
+

@@ -17,10 +17,9 @@ public class InterfaceDTO extends BaseDTO implements Serializable {
 
     private boolean groupExtends = true;
 
-    private String routeResourceUrl = null;
 
-    public String getRouteResourceUrl() {
-        return StringUtils.isNotEmpty(routeResourceUrl) ? routeResourceUrl : super.getResourceUrl();
+    public String getResourcesRouteResourceUrl() {
+        return StringUtils.isNotEmpty(super.getRouteResourceUrl()) ? super.getRouteResourceUrl() : super.getResourceUrl();
     }
 
 }

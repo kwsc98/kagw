@@ -81,7 +81,7 @@ public class ChannelService {
             if (interfaceDTO.isGroupExtends()) {
                 groupHandlerList = groupDTO.getHandlerList();
             }
-            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(interfaceDTO).setLoadBalancer(loadBalancer).setRouteResourceUrl(interfaceDTO.getRouteResourceUrl()).setGroupHandlerList(groupHandlerList).setHandlerList(interfaceDTO.getHandlerList());
+            ResourceDTO interfaceResourceDTO = ResourceDTO.build().setBaseDTO(interfaceDTO).setLoadBalancer(loadBalancer).setRouteResourceUrl(interfaceDTO.getResourcesRouteResourceUrl()).setGroupHandlerList(groupHandlerList).setHandlerList(interfaceDTO.getHandlerList());
             resourceTrie.put(splitUrl(interfaceDTO.getResourceUrl()), interfaceResourceDTO);
         }
         log.info("GroupDTO : {} Registration Done", groupDTO.getResourceName());
