@@ -4,7 +4,7 @@ kagw是一个基于netty为网络模型的高性能网关，支持API接口分�
 <br/>
 
 ## SpringBoot的方式启动
-### 支持已本地配置文件 or Nacos基于yaml格式热配置部署
+### 支持已本地配置文件 or Nacos配置，基于yaml格式可实现热配置部署
 引入 spring-boot-starter-kagw 包后只需增加配置资源地址 kagw.registeredPath 即可启动
  application.properties
  ```java
