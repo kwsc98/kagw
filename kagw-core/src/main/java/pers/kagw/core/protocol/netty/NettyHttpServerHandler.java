@@ -23,7 +23,7 @@ import java.util.UUID;
  * @author kwsc98
  */
 @Slf4j
-public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+public class NettyHttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private final KagwApplicationContext kagwApplicationContext;
 
@@ -38,34 +38,30 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
         MDC.put("UUID", UUID.randomUUID().toString());
         Object responseObject = null;
         try {
-            if (msg instanceof FullHttpRequest) {
-                //获取httpRequest
-                FullHttpRequest httpRequest = (FullHttpRequest) msg;
-                //获取请求路径、请求体、请求方法
-                String url = httpRequest.uri();
-                String content = httpRequest.content().toString(CharsetUtil.UTF_8);
-                HttpMethod method = httpRequest.method();
-                RequestHandlerDTO<Object> requestHandlerDTO = RequestHandlerDTO.build().setContent(content).setResourceUrl(url).setHttpMethod(method);
-                log.info("Request Url : {} ,Content : {} ,Method : {} ", url, content, method);
-                //网关处理逻辑
-                try {
-                    responseObject = this.kagwApplicationContext.getDisposeService().dealWith(requestHandlerDTO);
-                } catch (ApiGateWayException apiGateWayException) {
-                    String infoStr = apiGateWayException.getInfoStr();
-                    log.debug("DealWith Error : {}", infoStr);
-                    if (StringUtils.isNotEmpty(infoStr)) {
-                        responseObject = infoStr;
-                    }
+            //获取请求路径、请求体、请求方法
+            String url = httpRequest.uri();
+            String content = httpRequest.content().toString(CharsetUtil.UTF_8);
+            HttpMethod method = httpRequest.method();
+            RequestHandlerDTO<Object> requestHandlerDTO = RequestHandlerDTO.build().setContent(content).setResourceUrl(url).setHttpMethod(method);
+            log.info("Request Url : {} ,Content : {} ,Method : {} ", url, content, method);
+            //网关处理逻辑
+            try {
+                responseObject = this.kagwApplicationContext.getDisposeService().dealWith(requestHandlerDTO);
+            } catch (ApiGateWayException apiGateWayException) {
+                String infoStr = apiGateWayException.getInfoStr();
+                log.debug("DealWith Error : {}", infoStr);
+                if (StringUtils.isNotEmpty(infoStr)) {
+                    responseObject = infoStr;
                 }
-                if (Objects.isNull(responseObject) || (!(responseObject instanceof String))) {
-                    responseObject = JsonUtils.writeValueAsString(responseObject);
-                }
-                log.info("Response Url : {} ,Content: {} ,Method : {} ", url, responseObject, method);
             }
+            if (Objects.isNull(responseObject) || (!(responseObject instanceof String))) {
+                responseObject = JsonUtils.writeValueAsString(responseObject);
+            }
+            log.info("Response Url : {} ,Content: {} ,Method : {} ", url, responseObject, method);
         } catch (Exception e) {
             log.error("Netty Handler Error : {}", e.toString(), e);
         } finally {
