@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 import pers.kagw.core.KagwApplicationContext;
 import pers.kagw.core.handler.ComponentHandler;
 import pers.kagw.core.handler.HandlerService;
+import pers.kagw.core.registry.RegistryClient;
 
 /**
  * krpc
@@ -34,6 +35,9 @@ public class KagwPostProcessor implements BeanPostProcessor {
         HandlerService handlerService = krpcApplicationContext.getHandlerService();
         if (bean instanceof ComponentHandler) {
             handlerService.registerChannelHandler(beanName, (ComponentHandler<?, ?>) bean);
+        }
+        if (bean instanceof RegistryClient) {
+            krpcApplicationContext.getRegistryBuilderFactory().setRegistryClient((RegistryClient) bean);
         }
         return bean;
     }

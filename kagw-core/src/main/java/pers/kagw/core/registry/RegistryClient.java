@@ -2,6 +2,7 @@ package pers.kagw.core.registry;
 
 
 import pers.kagw.core.dto.GroupDTO;
+import pers.kagw.core.handler.ChannelService;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -19,7 +20,7 @@ public interface RegistryClient {
     /**
      * 注册中心初始化方法
      **/
-    void init(RegistryClientInfo registryClientInfo);
+    void init(String serverAddr,ChannelService channelService);
 
     /**
      * 网关配置文件刷新

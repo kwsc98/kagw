@@ -1,23 +1,12 @@
-package pers.kagw.core.registry.impl;
+package pres.kagw.register;
 
 
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingFactory;
-import com.alibaba.nacos.api.naming.NamingService;
-import com.alibaba.nacos.api.naming.listener.Event;
-import com.alibaba.nacos.api.naming.listener.EventListener;
-import com.alibaba.nacos.api.naming.listener.NamingEvent;
-import com.alibaba.nacos.api.naming.pojo.Instance;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
-import pers.kagw.core.KagwApplicationContext;
 import pers.kagw.core.common.JsonUtils;
 import pers.kagw.core.dto.GroupDTO;
 import pers.kagw.core.exception.ApiGateWayException;
@@ -25,9 +14,10 @@ import pers.kagw.core.handler.ChannelService;
 import pers.kagw.core.registry.RegistryClient;
 import pers.kagw.core.registry.RegistryClientInfo;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
 
 /**
  * kagw
@@ -38,18 +28,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class NacosClient implements RegistryClient, Listener {
 
-    private final ChannelService channelService;
-
-    public NacosClient(ChannelService channelService) {
-        this.channelService = channelService;
-    }
+    private  ChannelService channelService;
 
     @Override
-    public void init(RegistryClientInfo registryClientInfo) {
+    public void init(String serverAddr,ChannelService channelService) {
         log.info("NacosClient Init Start");
         try {
+            this.channelService = channelService;
             Properties properties = new Properties();
-            properties.put("serverAddr", registryClientInfo.getServerAddr());
+            properties.put("serverAddr", serverAddr);
             ConfigService configService = NacosFactory.createConfigService(properties);
             String yamlStr = configService.getConfigAndSignListener("kagw", "kagw_group", 5000, this);
             List<GroupDTO> list = getGroupDTOList(yamlStr);

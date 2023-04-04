@@ -3,6 +3,8 @@ package pres.kagw.spring;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,24 +26,28 @@ import pers.kagw.core.registry.RegistryClientInfo;
  * @since
  **/
 @Configuration
-@ConditionalOnClass(KagwProperties.class)
-@EnableConfigurationProperties(KagwProperties.class)
+@ConditionalOnClass(SpringKagwProperties.class)
+@EnableConfigurationProperties(SpringKagwProperties.class)
 @Slf4j
 @ConditionalOnProperty(name = "kagw.registeredPath", matchIfMissing = false)
-public class AutoConfig {
+public class AutoConfig implements ApplicationRunner {
+
+    private KagwApplicationContext kagwApplicationContext;
 
     @Bean(name = "KagwApplicationContext")
     @ConditionalOnMissingBean
-    public KagwApplicationContext init(KagwProperties kagwProperties) {
-        log.info("Kagw Start Init");
-        return KagwBuilderFactory.builder()
+    public KagwApplicationContext init(SpringKagwProperties kagwProperties) {
+        log.info("Kagw Init");
+        this.kagwApplicationContext = KagwBuilderFactory.builder()
                 .setRegistryBuilderFactory(
                         RegistryBuilderFactory.builder()
                                 .setRegistryClientInfo(
                                         RegistryClientInfo.build(kagwProperties.getRegisteredPath())
                                 )
                 )
-                .setPort(kagwProperties.getPort()).build().init();
+                .setPort(kagwProperties.getPort())
+                .build();
+        return this.kagwApplicationContext;
     }
 
     @Bean
@@ -51,5 +57,9 @@ public class AutoConfig {
         return new KagwPostProcessor(kagwApplicationContext);
     }
 
-
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        log.info("Kagw Start");
+        this.kagwApplicationContext.init();
+    }
 }

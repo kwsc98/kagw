@@ -2,6 +2,7 @@ package pers.kagw.core.registry;
 
 
 import lombok.Setter;
+import pers.kagw.core.handler.ChannelService;
 
 /**
  * kagw注册中心处理Service
@@ -20,8 +21,8 @@ public class RegistryService  {
         return registryService;
     }
 
-    public void init(RegistryClientInfo registryClientInfo) {
-        this.registryClient.init(registryClientInfo);
+    public void init(RegistryClientInfo registryClientInfo, ChannelService channelService) {
+        this.registryClient.init(registryClientInfo.getServerAddr(),channelService);
     }
 
 

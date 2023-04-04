@@ -17,9 +17,4 @@ public class HandlerService {
         return channelMap.get(name);
     }
 
-
-    public static void main(String[] args) {
-
-    }
-
 }

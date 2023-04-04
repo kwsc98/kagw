@@ -3,6 +3,7 @@ package pres.kagw.spring;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import pers.kagw.core.dto.KagwProperties;
 
 /**
  * kagw
@@ -12,11 +13,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @since
  **/
 @ConfigurationProperties(prefix = "kagw")
-@Data
-public class KagwProperties {
-
-    private String registeredPath;
-
-    private int port = 8080;
+public class SpringKagwProperties extends KagwProperties {
 
 }

@@ -2,6 +2,7 @@ package pers.kagw.core.registry;
 
 
 import lombok.Data;
+import pers.kagw.core.registry.impl.ConfigurationClient;
 
 import java.util.Arrays;
 
@@ -16,11 +17,11 @@ public class RegistryClientInfo {
 
     private String serverAddr;
 
-    private Client client;
+
+    private RegistryClient registryClient;
 
     public static RegistryClientInfo build(String serverAddr) {
-        String[] strings = serverAddr.split("://");
-        return new RegistryClientInfo().setClient(strings[0]).setServerAddr(strings[1]);
+        return new RegistryClientInfo().setServerAddr(serverAddr).setRegistryClient(new ConfigurationClient());
     }
 
     private RegistryClientInfo setServerAddr(String serverAddr) {
@@ -28,23 +29,8 @@ public class RegistryClientInfo {
         return this;
     }
 
-    private RegistryClientInfo setClient(String client) {
-        this.client = Client.getClient(client);
+    public RegistryClientInfo setRegistryClient(RegistryClient registryClient) {
+        this.registryClient = registryClient;
         return this;
     }
-
-    public enum Client {
-        /**
-         * Configuration
-         * Zookeeper
-         * Nacos
-         **/
-        Configuration, Zookeeper, Nacos;
-
-        public static Client getClient(String s) {
-            return Arrays.stream(Client.values()).filter(e -> e.name().equalsIgnoreCase(s)).findFirst().orElse(Configuration);
-        }
-    }
-
-
 }

@@ -1,8 +1,8 @@
 package pers.kagw.core.dto;
 
-import com.alibaba.nacos.common.utils.StringUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;

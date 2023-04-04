@@ -1,6 +1,6 @@
 package pers.kagw.core.protocol.netty;
 
-import com.alibaba.nacos.common.utils.StringUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -9,6 +9,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import pers.kagw.core.KagwApplicationContext;
 import pers.kagw.core.common.JsonUtils;

@@ -1,5 +1,6 @@
 rootProject.name = 'kagw'
 include ':kagw-core'
 include ':kagw-example'
+include ':kagw-register-nacos'
 include ':kagw-spring-boot'
 findProject(':kagw-spring-boot').setName('spring-boot-starter-kagw')

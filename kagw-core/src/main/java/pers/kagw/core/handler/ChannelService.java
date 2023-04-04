@@ -66,6 +66,7 @@ public class ChannelService {
         for (GroupDTO groupDTO : groupDTOList) {
             registrationGroup(resourceTrie, groupDTO);
         }
+        //已替换的方式刷新缓存，不影响正在调用的请求
         this.resourceTrie = resourceTrie;
         this.concurrentHashMap = new ConcurrentHashMap<>();
     }

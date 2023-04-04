@@ -1,12 +1,13 @@
 package pers.kagw.core.handler.impl;
 
-import com.alibaba.nacos.common.utils.StringUtils;
-import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.handler.codec.http.FullHttpRequest;
+
 import io.netty.channel.Channel;
 import io.netty.channel.DefaultEventLoop;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import pers.kagw.core.dto.ResourceDTO;
 import pers.kagw.core.exception.ApiGateWayException;
 import pers.kagw.core.handler.BaseComponentHandler;

@@ -26,23 +26,17 @@ import java.util.Map;
 public class ConfigurationClient extends FileAlterationListenerAdaptor implements RegistryClient {
 
 
-    private final ChannelService channelService;
+    private ChannelService channelService;
 
     private String configFileName = "";
 
-
-    public ConfigurationClient(ChannelService channelService) {
-        this.channelService = channelService;
-    }
-
-
     @Override
-    public void init(RegistryClientInfo registryClientInfo) {
+    public void init(String serverAddr,ChannelService channelService) {
+        this.channelService = channelService;
         log.info("ConfigurationClient Init Start");
-        String filePath = registryClientInfo.getServerAddr();
-        String[] pathArray = filePath.split("/");
+        String[] pathArray = serverAddr.split("/");
         configFileName = pathArray[pathArray.length - 1];
-        File file = new File(filePath);
+        File file = new File(serverAddr);
         List<GroupDTO> list = getGroupDTOList(file);
         doRefresh(list);
         StringBuilder stringBuilder = new StringBuilder("/");
