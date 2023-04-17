@@ -1,5 +1,8 @@
 dependencies {
     implementation project(':spring-boot-starter-kagw')
-    //implementation project(':kagw-register-nacos')
+//    implementation project(':kagw-register-nacos')
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'pres.krpc:spring-boot-starter-krpc:0.0.1-SNAPSHOT'
+    implementation 'pres.krpc:krpc-example-interface:0.0.1-SNAPSHOT'
+
 }

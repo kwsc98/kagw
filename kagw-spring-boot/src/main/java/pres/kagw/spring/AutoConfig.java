@@ -53,7 +53,7 @@ public class AutoConfig implements ApplicationRunner {
     @Bean
     @DependsOn({"KagwApplicationContext"})
     @ConditionalOnMissingBean
-    public KagwPostProcessor dtpPostProcessor(@Qualifier("KagwApplicationContext") KagwApplicationContext kagwApplicationContext) {
+    public KagwPostProcessor kagwPostProcessor(@Qualifier("KagwApplicationContext") KagwApplicationContext kagwApplicationContext) {
         return new KagwPostProcessor(kagwApplicationContext);
     }
 

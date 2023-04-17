@@ -18,14 +18,14 @@ group:
           - TokenBaseComponent:20
       - resourceName: GetNowTime
         resourceUrl: /kapi/test/getNowTime
-        routeResourceUrl: /krpc/test/getGetNowTime
+        routeResourceUrl: /krpc/test/getNowTime
         groupExtends: true
         handlerList:
           - CheckTokenComponent
       - resourceName: GetNowTimeV2
         resourceUrl: /kapi/test/getNowTimeV2
-        routeResourceUrl: /krpc/test/getNowTime
         groupExtends: true
         handlerList:
           - CheckTokenComponent
+          - KrpcBaseComponent
 #          - MockBaseComponent:Mock Data

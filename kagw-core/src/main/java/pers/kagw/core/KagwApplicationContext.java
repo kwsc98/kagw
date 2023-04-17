@@ -28,8 +28,6 @@ public class KagwApplicationContext {
 
     private final RegistryBuilderFactory registryBuilderFactory;
 
-    private RegistryService registryService;
-
 
     public KagwApplicationContext(RegistryBuilderFactory registryBuilderFactory, int port) {
         try {
@@ -44,7 +42,7 @@ public class KagwApplicationContext {
     }
 
     public KagwApplicationContext init() {
-        this.registryService = registryBuilderFactory.init(this.channelService);
+        registryBuilderFactory.init(this.channelService);
         return this;
     }
 
