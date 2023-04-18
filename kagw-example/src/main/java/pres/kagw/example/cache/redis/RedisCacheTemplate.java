@@ -1,6 +1,5 @@
 package pres.kagw.example.cache.redis;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import org.springframework.data.redis.core.RedisTemplate;
 import pres.kagw.example.cache.CacheTemplate;
 
