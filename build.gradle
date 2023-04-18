@@ -33,7 +33,6 @@ subprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
-        implementation 'org.springframework.boot:spring-boot-starter'
         implementation 'ch.qos.logback:logback-classic'
         implementation 'org.slf4j:log4j-over-slf4j'
         implementation 'org.apache.commons:commons-lang3:3.12.0'
